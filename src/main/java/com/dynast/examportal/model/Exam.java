@@ -20,12 +20,13 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String examId;
 
-    //    @ManyToOne
-    @JoinColumn(name = "subjectId")
-    private Subject subjectId;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "subjectId" , referencedColumnName = "subjectId")
+    private Subject subject;
 
-    @JoinColumn(name = "examCategoryId")
-    private ExamCategory examCategoryId;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "examCategoryId", referencedColumnName = "examCategoryId")
+    private ExamCategory examCategory;
 
     private String examTitle;
     private String examDescription;
@@ -33,6 +34,7 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     private int totalMark;
     private int examDuration;
     private Date examEndDate;
+    private Boolean isPaid;
 
     @Column(name = "updated_by")
     private String updatedBy;

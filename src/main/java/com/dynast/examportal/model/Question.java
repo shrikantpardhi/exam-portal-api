@@ -24,16 +24,19 @@ public class Question extends AbstractTimestampEntity implements Serializable {
 //    @Column(name="QUE_ID")
     private String questionId;
 
-    @JoinColumn(name = "examId")
-    private Exam examId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "questionExamId", referencedColumnName = "examId")
+    private Exam exam;
 
     @NotNull(message = "Subject is Mandatory")
-    @JoinColumn(name = "subjectId")
-    private Subject subjectId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "subjectId", referencedColumnName = "subjectId")
+    private Subject subject;
 
     @NotNull(message = "Question Type is Mandatory")
-    @JoinColumn(name = "questionTypeId")
-    private QuestionType questionTypeId;
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "questionTypeId", referencedColumnName = "questionTypeId")
+    private QuestionType questionType;
 
     @Type(type = "text")
     @NotNull(message = "Question Name is Mandatory")

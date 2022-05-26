@@ -1,6 +1,6 @@
 package com.dynast.examportal.service;
 
-import com.dynast.examportal.exception.UserNotFoundException;
+import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.model.Role;
 import com.dynast.examportal.model.User;
 import com.dynast.examportal.repository.RoleRepository;
@@ -89,10 +89,10 @@ public class UserService {
     }
 
     public User fetchUser(String emailId) {
-        return userRepository.findByEmail(emailId).orElseThrow(() -> new UserNotFoundException(emailId));
+        return userRepository.findByEmail(emailId).orElseThrow(() -> new NotFoundException(emailId));
     }
 
     public User getUserDetail(String userName) {
-        return userRepository.findByUserName(userName).orElseThrow(() -> new UserNotFoundException(userName));
+        return userRepository.findByUserName(userName).orElseThrow(() -> new NotFoundException(userName));
     }
 }

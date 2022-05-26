@@ -1,6 +1,6 @@
 package com.dynast.examportal.service;
 
-import com.dynast.examportal.exception.SubjectNotFoundException;
+import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.model.Subject;
 import com.dynast.examportal.repository.SubjectRepository;
 import com.dynast.examportal.util.User;
@@ -44,7 +44,7 @@ public class SubjectService {
     }
 
     public Subject getSubjectById(String id) {
-        return subjectRepository.findById(id).orElseThrow(() -> new SubjectNotFoundException("Could not find subject"));
+        return subjectRepository.findById(id).orElseThrow(() -> new NotFoundException("Could not find subject"));
     }
 
 }

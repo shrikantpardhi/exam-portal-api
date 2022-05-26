@@ -18,31 +18,31 @@ public class SubjectController {
     private SubjectService subjectService;
 
     @GetMapping("{sujectId}")
-    @PreAuthorize("hasRole('Admin')")
+//    @PreAuthorize("hasRole('Admin')")
     Subject oneSubject(@PathVariable String sujectId) {
         return subjectService.getSubjectById(sujectId);
     }
 
     @PostMapping({"create"})
-    @PreAuthorize("hasRole('Admin')")
+//    @PreAuthorize("hasRole('Admin')")
     public Subject createNewSubject(@Valid @RequestBody Subject subject) {
         return subjectService.createNewSubject(subject);
     }
 
     @PutMapping({"update"})
-    @PreAuthorize("hasRole('Admin')")
+//    @PreAuthorize("hasRole('Admin')")
     public Optional<Subject> updateSubject(@Valid @RequestBody Subject subject) {
         return subjectService.updateSubject(subject);
     }
 
     @GetMapping("all")
-    @PreAuthorize("hasRole('Admin')")
+//    @PreAuthorize("hasRole('Admin')")
     Iterable<Subject> allSubject() {
         return subjectService.getAllSubject();
     }
 
     @DeleteMapping("{subjectId}")
-    @PreAuthorize("hasRole('Admin')")
+//    @PreAuthorize("hasRole('Admin')")
     Subject deleteSubject(@PathVariable String subjectId) {
         return subjectService.deleteSubjectById(subjectId);
     }
