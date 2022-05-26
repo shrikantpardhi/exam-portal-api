@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface UserResultRepository extends CrudRepository<UserResult, String> {
     Iterable<UserResult> findByUserId(String userName);
 
-    Optional<UserResult>  findByUserIdAndResultId(String userName, String resultId);
+    Optional<UserResult> findByUserIdAndResultId(String userName, String resultId);
 }

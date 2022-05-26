@@ -1,7 +1,8 @@
 package com.dynast.examportal.service;
 
-import com.dynast.examportal.exception.UnprocessableEntityException;
+import com.dynast.examportal.exception.DataBaseException;
 import com.dynast.examportal.exception.NotFoundException;
+import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.ExamCategory;
 import com.dynast.examportal.repository.ExamCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ public class ExamCategoryService {
     @Autowired
     private ExamCategoryRepository examCategoryRepository;
 
-    public ExamCategory delete(String examCategoryId) {
+    public ExamCategory delete(String examCategoryId) throws DataBaseException {
         Optional<ExamCategory> examCategory = Optional.ofNullable(examCategoryRepository.findById(examCategoryId)
                 .orElseThrow(() -> new NotFoundException("Could not find Exam Category!")));
         examCategoryRepository.delete(examCategory.get());

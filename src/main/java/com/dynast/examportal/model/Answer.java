@@ -20,8 +20,9 @@ public class Answer {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String answerId;
 
-    @JoinColumn(name = "questionId")
-    private Question questionId;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "questionId", referencedColumnName = "questionId")
+    private Question question;
 
     @Type(type = "text")
     @NotNull(message = "Answer is Mandatory")

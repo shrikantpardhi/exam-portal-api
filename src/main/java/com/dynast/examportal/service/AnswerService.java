@@ -2,9 +2,13 @@ package com.dynast.examportal.service;
 
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.model.Answer;
+import com.dynast.examportal.model.Question;
 import com.dynast.examportal.repository.AnswerRepository;
+import com.dynast.examportal.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AnswerService {
@@ -12,15 +16,20 @@ public class AnswerService {
     @Autowired
     private AnswerRepository answerRepository;
 
+    @Autowired
+    private QuestionRepository questionRepository;
 
     public void delete(String answerId) {
         answerRepository.deleteById(answerId);
     }
 
     public Answer update(Answer answer) {
+        Question question = questionRepository.findById(answer.getQuestion().getQuestionId()).orElseThrow(
+                () -> new NotFoundException("Could Not find Question")
+        );
         return answerRepository.findById(answer.getAnswerId()).map(ans -> {
             ans.setAnswerText(answer.getAnswerText());
-            ans.setQuestionId(answer.getQuestionId());
+            ans.setQuestion(question);
             ans.setAnswerImage(answer.getAnswerImage());
             ans.setIsCorrect(answer.getIsCorrect());
             return answerRepository.save(ans);
@@ -34,7 +43,8 @@ public class AnswerService {
     }
 
     public Answer getByQuestion(String questionId, String answerId) {
-        return answerRepository.findByAnswerIdAndQuestionId(questionId, answerId).orElseThrow(
+        Optional<Question> question = questionRepository.findById(questionId);
+        return answerRepository.findByAnswerIdAndQuestion(answerId, question.get().getQuestionId()).orElseThrow(
                 () -> new NotFoundException("")
         );
     }

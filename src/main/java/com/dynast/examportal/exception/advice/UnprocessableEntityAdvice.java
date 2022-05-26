@@ -12,7 +12,7 @@ public class UnprocessableEntityAdvice {
     @ResponseBody
     @ExceptionHandler(UnprocessableEntityException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    String userNotFoundHandler(UnprocessableEntityException ex) {
+    String unprocessableEntityHandler(UnprocessableEntityException ex) {
         return ex.getMessage();
     }
 }

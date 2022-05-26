@@ -10,8 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface AnswerRepository extends CrudRepository<Answer, String> {
-//    @Query("select u from User u where u.email = :email AND u.age >= :age")
-    Optional<Answer> findByAnswerIdAndQuestionId(String questionId, String answerId);
+    //    @Query("select u from User u where u.email = :email AND u.age >= :age")
+    Optional<Answer> findByAnswerIdAndQuestion(String questionId, String answerId);
 
     @Query(value = "select a from answer where a.question_id = :questionId", nativeQuery = true)
     Iterable<Answer> findAllByQuestionId(@Param("questionId") String questionId);

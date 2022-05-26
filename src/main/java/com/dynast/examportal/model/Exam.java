@@ -21,7 +21,7 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     private String examId;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "subjectId" , referencedColumnName = "subjectId")
+    @JoinColumn(name = "subjectId", referencedColumnName = "subjectId")
     private Subject subject;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -30,7 +30,7 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
 
     private String examTitle;
     private String examDescription;
-    private String isNegativeAllowed;
+    private Boolean isNegativeAllowed;
     private int totalMark;
     private int examDuration;
     private Date examEndDate;

@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 public class ApplicationController {
     @Autowired
     private User user;
-    public String getUser(){
+
+    public String getUser() {
         return user.getUsername();
     }
 }

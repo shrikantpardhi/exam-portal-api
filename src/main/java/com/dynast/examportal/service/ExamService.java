@@ -1,7 +1,7 @@
 package com.dynast.examportal.service;
 
-import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.exception.NotFoundException;
+import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.Exam;
 import com.dynast.examportal.model.ExamCategory;
 import com.dynast.examportal.model.Subject;
@@ -27,7 +27,7 @@ public class ExamService {
 
     public Exam create(Exam exam) {
         Optional<Subject> subject = subjectRepository.findById(exam.getSubject().getSubjectId());
-        ExamCategory examCategory   = examCategoryRepository.findById(exam.getExamCategory().getExamCategoryId()).orElseThrow(
+        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategory().getExamCategoryId()).orElseThrow(
                 () -> new NotFoundException("Could  not find exam category!")
         );
         exam.setSubject(subject.get());
@@ -37,7 +37,7 @@ public class ExamService {
 
     public Exam update(Exam exam) {
         Optional<Subject> subject = subjectRepository.findById(exam.getSubject().getSubjectId());
-        ExamCategory examCategory   = examCategoryRepository.findById(exam.getExamCategory().getExamCategoryId()).orElseThrow(
+        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategory().getExamCategoryId()).orElseThrow(
                 () -> new NotFoundException("Could  not find exam category!")
         );
         return examRepository.findById(exam.getExamId()).map(
@@ -70,6 +70,6 @@ public class ExamService {
     }
 
     public Exam getOne(String examId) {
-        return examRepository.findById(examId).orElseThrow(()-> new NotFoundException("Could not find Exam!"));
+        return examRepository.findById(examId).orElseThrow(() -> new NotFoundException("Could not find Exam!"));
     }
 }

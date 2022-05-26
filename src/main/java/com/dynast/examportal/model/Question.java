@@ -48,7 +48,7 @@ public class Question extends AbstractTimestampEntity implements Serializable {
     @Type(type = "text")
     private String questionAnswerDescription;
 
-    private String negativeMark;
+    private Boolean isNegativeAllowed;
 
     @Lob
     @Column(name = "question_image", columnDefinition = "BLOB")

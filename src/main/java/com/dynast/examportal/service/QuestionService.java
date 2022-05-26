@@ -2,10 +2,18 @@ package com.dynast.examportal.service;
 
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
-import com.dynast.examportal.model.*;
-import com.dynast.examportal.repository.*;
+import com.dynast.examportal.model.Exam;
+import com.dynast.examportal.model.Question;
+import com.dynast.examportal.model.QuestionType;
+import com.dynast.examportal.model.Subject;
+import com.dynast.examportal.repository.ExamRepository;
+import com.dynast.examportal.repository.QuestionRepository;
+import com.dynast.examportal.repository.QuestionTypeRepository;
+import com.dynast.examportal.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class QuestionService {
@@ -23,44 +31,31 @@ public class QuestionService {
     private QuestionTypeRepository questionTypeRepository;
 
     public Question create(Question question) {
-        Subject subject = subjectRepository.findById(question.getSubject().getSubjectId()).orElseThrow(
-                () -> new NotFoundException("Could not find subject!")
-        );
-        Exam exam = examRepository.findById(question.getExam().getExamId()).orElseThrow(
-                () -> new NotFoundException("Could not find exam!")
-        );
-        QuestionType questionType = questionTypeRepository.findById(question.getQuestionType().getQuestionTypeId()).orElseThrow(
-                () -> new NotFoundException("Could not find the question type")
-        );
-        question.setSubject(subject);
-        question.setExam(exam);
-        question.setQuestionType(questionType);
+        Optional<Subject> subject = subjectRepository.findById(question.getSubject().getSubjectId());
+        Optional<Exam> exam = examRepository.findById(question.getExam().getExamId());
+        Optional<QuestionType> questionType = questionTypeRepository.findById(question.getQuestionType().getQuestionTypeId());
+        question.setSubject(subject.get());
+        question.setExam(exam.get());
+        question.setQuestionType(questionType.get());
         return questionRepository.save(question);
     }
 
     public Question update(Question question) {
-        Subject subject = subjectRepository.findById(question.getSubject().getSubjectId()).orElseThrow(
-                () -> new NotFoundException("Could not find subject!")
-        );
-        Exam exam = examRepository.findById(question.getExam().getExamId()).orElseThrow(
-                () -> new NotFoundException("Could not find exam!")
-        );
-        QuestionType questionType = questionTypeRepository.findById(question.getQuestionType().getQuestionTypeId()).orElseThrow(
-                () -> new NotFoundException("Could not find the question type")
-        );
+        Optional<Subject> subject = subjectRepository.findById(question.getSubject().getSubjectId());
+        Optional<Exam> exam = examRepository.findById(question.getExam().getExamId());
+        Optional<QuestionType> questionType = questionTypeRepository.findById(question.getQuestionType().getQuestionTypeId());
         return questionRepository.findById(question.getQuestionId()).map(
                 question1 -> {
-                    question1.setExam(exam);
-                    question1.setSubject(subject);
-                    question1.setQuestionType(questionType);
+                    question1.setExam(exam.get());
+                    question1.setSubject(subject.get());
+                    question1.setQuestionType(questionType.get());
                     question1.setQuestionTitle(question.getQuestionTitle());
-                    question1.setNegativeMark(question.getNegativeMark());
                     question1.setQuestionDescription(question.getQuestionDescription());
                     question1.setQuestionAnswerDescription(question.getQuestionAnswerDescription());
                     question1.setQuestionImage(question.getQuestionImage());
                     question1.setQuestionAnswerDescriptionImage(question.getQuestionAnswerDescriptionImage());
                     question1.setQuestionMark(question.getQuestionMark());
-                    question1.setNegativeMark(question.getNegativeMark());
+                    question1.setIsNegativeAllowed(question.getIsNegativeAllowed());
                     question1.setUpdatedBy(question.getUpdatedBy());
                     return questionRepository.save(question1);
                 }
