@@ -48,7 +48,10 @@ public class AnswerService {
     }
 
     public Iterable<AnswerDto> getAllByQuestion(String questionId) {
-        Iterable<Answer> answers = answerRepository.findAllByQuestionId(questionId);
+        Question question = questionRepository.findById(questionId).orElseThrow(
+                () -> new NotFoundException("Question Not found")
+        );
+        Iterable<Answer> answers = answerRepository.findByQuestion(question);
         List<AnswerDto> answerDtoList = new ArrayList<>();
         answers.forEach(
                 answer -> answerDtoList.add(toAnswerDto(answer))

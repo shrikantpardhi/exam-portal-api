@@ -1,6 +1,7 @@
 package com.dynast.examportal.repository;
 
 import com.dynast.examportal.model.Answer;
+import com.dynast.examportal.model.Question;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +16,6 @@ public interface AnswerRepository extends CrudRepository<Answer, String> {
 
     @Query(value = "select a from answer where a.question_id = :questionId", nativeQuery = true)
     Iterable<Answer> findAllByQuestionId(@Param("questionId") String questionId);
+
+    Iterable<Answer> findByQuestion(Question question);
 }
