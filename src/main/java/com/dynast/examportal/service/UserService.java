@@ -2,6 +2,7 @@ package com.dynast.examportal.service;
 
 import com.dynast.examportal.dto.UserDto;
 import com.dynast.examportal.exception.NotFoundException;
+import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.Role;
 import com.dynast.examportal.model.User;
 import com.dynast.examportal.repository.RoleRepository;
@@ -92,13 +93,16 @@ public class UserService {
     }
 
     private UserDto getCreateUserDto(UserDto user) {
+        Boolean status = validateIfExist(user.getEmail(), user.getUserMobile());
+        if (status)
+            throw new UnprocessableEntityException("Email or Mobile is already present");
         Role role = roleRepository.findById("User").orElse(null);
-        User u = mapper.convertValue(user, User.class);
+        User user1 = mapper.convertValue(user, User.class);
         Set<Role> userRoles = new HashSet<>();
         userRoles.add(role);
-        u.setRole(userRoles);
-        u.setUserPassword(getEncodedPassword(user.getUserPassword()));
-        return mapper.convertValue(userRepository.save(u), UserDto.class);
+        user1.setRole(userRoles);
+        user1.setUserPassword(getEncodedPassword(user.getUserPassword()));
+        return mapper.convertValue(userRepository.save(user1), UserDto.class);
     }
 
     public UserDto fetchUser(String emailId) {
@@ -109,5 +113,9 @@ public class UserService {
     public UserDto getUserDetail(String userName) {
         User user = userRepository.findByUserName(userName).orElseThrow(() -> new NotFoundException(userName));
         return mapper.convertValue(user, UserDto.class);
+    }
+
+    public Boolean validateIfExist(String emailId, String mobile) {
+        return userRepository.findByEmailOrUserMobile(emailId,mobile).isPresent();
     }
 }

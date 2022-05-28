@@ -5,6 +5,7 @@ import com.dynast.examportal.model.JwtResponse;
 import com.dynast.examportal.model.User;
 import com.dynast.examportal.repository.UserRepository;
 import com.dynast.examportal.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -20,18 +21,12 @@ import java.util.Set;
 
 @Service
 public class JwtService implements UserDetailsService {
-
-    private final JwtUtil jwtUtil;
-
-    private final UserRepository userRepository;
-
-    private final AuthenticationManager authenticationManager;
-
-    public JwtService(JwtUtil jwtUtil, UserRepository userRepository, AuthenticationManager authenticationManager) {
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.authenticationManager = authenticationManager;
-    }
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public JwtResponse createJwtToken(JwtRequest jwtRequest) throws Exception {
         String email = jwtRequest.getEmail();

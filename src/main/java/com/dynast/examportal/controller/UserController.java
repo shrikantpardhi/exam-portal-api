@@ -2,6 +2,7 @@ package com.dynast.examportal.controller;
 
 import com.dynast.examportal.dto.UserDto;
 import com.dynast.examportal.exception.DataBaseException;
+import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.JwtRequest;
 import com.dynast.examportal.model.JwtResponse;
 import com.dynast.examportal.service.JwtService;
@@ -9,6 +10,8 @@ import com.dynast.examportal.service.UserService;
 import io.swagger.annotations.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.PostConstruct;
 
 @RestController
 @Api(value = "All user profile related APIs", tags = {"User Controller"})
@@ -23,10 +26,10 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-    //	@PostConstruct
-//    public void initRoleAndUser() {
-//        userService.initRoleAndUser();
-//	}
+    /*@PostConstruct
+    public void initRoleAndUser() {
+        userService.initRoleAndUser();
+    }*/
 
     @ApiOperation(value = "This is used to get all users")
     @ApiResponses(value = {
@@ -47,8 +50,13 @@ public class UserController {
     @PostMapping({"create"})
     public JwtResponse registerNewUser(@ApiParam(name = "user", required = true) @RequestBody UserDto user) throws Exception {
         UserDto u = userService.registerNewUser(user);
-        JwtRequest jwtRequest = new JwtRequest(user.getEmail(), user.getUserPassword());
-        return jwtService.createJwtToken(jwtRequest);
+        if (u != null) {
+            JwtRequest jwtRequest = new JwtRequest(user.getEmail(), user.getUserPassword());
+            return jwtService.createJwtToken(jwtRequest);
+        } else {
+            throw new UnprocessableEntityException("Unable to create New User");
+        }
+
     }
 
     @ApiOperation(value = "This is used to update user")
@@ -82,6 +90,17 @@ public class UserController {
     @PreAuthorize("hasAnyRole('Admin','User')")
     public UserDto getUserDetail(@ApiParam(name = "userName", required = true) @PathVariable String userName) {
         return userService.getUserDetail(userName);
+    }
+
+    @ApiOperation(value = "Used to validate if user exist")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved"),
+            @ApiResponse(code = 404, message = "Not found - The user was not found")
+    })
+    @GetMapping({"/user/validate"})
+    public Boolean validate(@ApiParam(name = "emailId", required = true) @RequestParam String emailId,
+                            @ApiParam(name = "mobile", required = true) @RequestParam String mobile) {
+        return userService.validateIfExist(emailId, mobile);
     }
 
 }

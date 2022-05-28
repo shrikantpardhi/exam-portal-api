@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ApplicationController {
-    private final User user;
+    private User user;
 
     public ApplicationController(User user) {
         this.user = user;
