@@ -1,13 +1,12 @@
 package com.dynast.examportal.controller;
 
+import com.dynast.examportal.dto.SubjectDto;
 import com.dynast.examportal.exception.DataBaseException;
-import com.dynast.examportal.model.Subject;
 import com.dynast.examportal.service.SubjectService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -24,7 +23,7 @@ public class SubjectController {
     })
     @GetMapping("{sujectId}")
 //    @PreAuthorize("hasRole('Admin')")
-    Subject oneSubject(@ApiParam(name = "Subject Id", required = true) @PathVariable String sujectId) {
+    public SubjectDto oneSubject(@ApiParam(name = "sujectId", required = true) @PathVariable String sujectId) {
         return subjectService.getSubjectById(sujectId);
     }
 
@@ -36,7 +35,7 @@ public class SubjectController {
     })
     @PostMapping({"create"})
 //    @PreAuthorize("hasRole('Admin')")
-    public Subject createNewSubject(@ApiParam(name = "Subject", required = true) @RequestBody Subject subject) {
+    public SubjectDto createNewSubject(@ApiParam(name = "subject", required = true) @RequestBody SubjectDto subject) {
         return subjectService.createNewSubject(subject);
     }
 
@@ -47,7 +46,7 @@ public class SubjectController {
     })
     @PutMapping({"update"})
 //    @PreAuthorize("hasRole('Admin')")
-    public Optional<Subject> updateSubject(@ApiParam(name = "Subject", required = true) @RequestBody Subject subject) throws DataBaseException {
+    public Optional<SubjectDto> updateSubject(@ApiParam(name = "subject", required = true) @RequestBody SubjectDto subject) throws DataBaseException {
         return subjectService.updateSubject(subject);
     }
 
@@ -58,7 +57,7 @@ public class SubjectController {
     })
     @GetMapping("all")
 //    @PreAuthorize("hasRole('Admin')")
-    Iterable<Subject> allSubject() {
+    public Iterable<SubjectDto> allSubject() {
         return subjectService.getAllSubject();
     }
 
@@ -69,7 +68,7 @@ public class SubjectController {
     })
     @DeleteMapping("{subjectId}")
 //    @PreAuthorize("hasRole('Admin')")
-    Subject deleteSubject(@ApiParam(name = "Subject id", required = true) @PathVariable String subjectId) throws DataBaseException {
-        return subjectService.deleteSubjectById(subjectId);
+    public void deleteSubject(@ApiParam(name = "subjectId", required = true) @PathVariable String subjectId) throws DataBaseException {
+        subjectService.deleteSubjectById(subjectId);
     }
 }

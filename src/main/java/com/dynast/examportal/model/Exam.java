@@ -35,7 +35,5 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     private int examDuration;
     private Date examEndDate;
     private Boolean isPaid;
-
-    @Column(name = "updated_by")
     private String updatedBy;
 }

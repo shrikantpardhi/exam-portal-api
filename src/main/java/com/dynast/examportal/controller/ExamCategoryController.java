@@ -1,7 +1,7 @@
 package com.dynast.examportal.controller;
 
+import com.dynast.examportal.dto.ExamCategoryDto;
 import com.dynast.examportal.exception.DataBaseException;
-import com.dynast.examportal.model.ExamCategory;
 import com.dynast.examportal.service.ExamCategoryService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class ExamCategoryController extends ApplicationController {
             @ApiResponse(code = 404, message = "No data present")
     })
     @GetMapping("all")
-    public Iterable<ExamCategory> all() {
+    public Iterable<ExamCategoryDto> all() {
         return examCategoryService.findAll();
     }
 
@@ -31,7 +31,7 @@ public class ExamCategoryController extends ApplicationController {
             @ApiResponse(code = 404, message = "Not Found - Exam Category not found")
     })
     @GetMapping("{examCategoryId}")
-    public ExamCategory getOne(@ApiParam(name = "Exam Category Id", required = true)@PathVariable String examCategoryId) {
+    public ExamCategoryDto getOne(@ApiParam(name = "examCategoryId", required = true)@PathVariable String examCategoryId) {
         return examCategoryService.findById(examCategoryId);
     }
 
@@ -41,7 +41,7 @@ public class ExamCategoryController extends ApplicationController {
             @ApiResponse(code = 422, message = "Unable to process request")
     })
     @PostMapping("create")
-    public ExamCategory create(@ApiParam(name = "Exam Category", required = true)@RequestBody ExamCategory examCategory) {
+    public ExamCategoryDto create(@ApiParam(name = "examCategory", required = true)@RequestBody ExamCategoryDto examCategory) {
         examCategory.setUpdatedBy(getUser());
         return examCategoryService.create(examCategory);
     }
@@ -52,7 +52,7 @@ public class ExamCategoryController extends ApplicationController {
             @ApiResponse(code = 422, message = "Unable to process request")
     })
     @PutMapping("update")
-    public ExamCategory update(@ApiParam(name = "Exam Category", required = true)@RequestBody ExamCategory examCategory) throws DataBaseException {
+    public ExamCategoryDto update(@ApiParam(name = "examCategory", required = true)@RequestBody ExamCategoryDto examCategory) throws DataBaseException {
         examCategory.setUpdatedBy(getUser());
         return examCategoryService.update(examCategory);
     }
@@ -63,7 +63,7 @@ public class ExamCategoryController extends ApplicationController {
             @ApiResponse(code = 422, message = "Unable to delete")
     })
     @DeleteMapping("{examCategoryId}")
-    public ExamCategory delete(@ApiParam(name = "Exam Category id", required = true)@PathVariable String examCategoryId) throws DataBaseException {
-        return examCategoryService.delete(examCategoryId);
+    public void delete(@ApiParam(name = "examCategoryId", required = true)@PathVariable String examCategoryId) throws DataBaseException {
+        examCategoryService.delete(examCategoryId);
     }
 }

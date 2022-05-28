@@ -1,13 +1,18 @@
 package com.dynast.examportal.service;
 
+import com.dynast.examportal.dto.SubjectDto;
 import com.dynast.examportal.exception.NotFoundException;
+import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.Subject;
 import com.dynast.examportal.repository.SubjectRepository;
+import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.dynast.examportal.util.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,33 +23,41 @@ public class SubjectService {
     @Autowired
     private User user;
 
-    public Subject createNewSubject(Subject subject) {
+    ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public SubjectDto createNewSubject(SubjectDto subject) {
         subject.setUpdatedBy(user.getUsername());
-        return subjectRepository.save(subject);
+        Subject s = mapper.convertValue(subject, Subject.class);
+        return mapper.convertValue(subjectRepository.save(s), SubjectDto.class);
     }
 
-    public Iterable<Subject> getAllSubject() {
-        return subjectRepository.findAll();
+    public Iterable<SubjectDto> getAllSubject() {
+        Iterable<Subject> subjects = subjectRepository.findAll();
+        List<SubjectDto> subjectDtos = new ArrayList<>();
+        subjects.forEach(
+                subject -> subjectDtos.add(mapper.convertValue(subject, SubjectDto.class))
+        );
+        return subjectDtos;
     }
 
-    public Optional<Subject> updateSubject(@Valid Subject subject) {
+    public Optional<SubjectDto> updateSubject(SubjectDto subject) {
         return Optional.ofNullable(subjectRepository.findById(subject.getSubjectId()).map(sub -> {
             sub.setTitle(subject.getTitle());
             sub.setDescription(subject.getDescription());
-            return subjectRepository.save(sub);
-        }).orElseGet(() -> {
-            return subjectRepository.save(subject);
-        }));
+            return mapper.convertValue(subjectRepository.save(sub), SubjectDto.class);
+        }).orElseThrow(
+                () -> new UnprocessableEntityException("Failed to update Subject " + subject.getTitle())
+        ));
     }
 
-    public Subject deleteSubjectById(String id) {
+    public void deleteSubjectById(String id) {
         Optional<Subject> sub = subjectRepository.findById(id);
         subjectRepository.delete(sub.get());
-        return sub.get();
     }
 
-    public Subject getSubjectById(String id) {
-        return subjectRepository.findById(id).orElseThrow(() -> new NotFoundException("Could not find subject"));
+    public SubjectDto getSubjectById(String id) {
+        Subject subject = subjectRepository.findById(id).orElseThrow(() -> new NotFoundException("Could not find subject"));
+        return mapper.convertValue(subject, SubjectDto.class);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.dynast.examportal.controller;
 
-import com.dynast.examportal.model.Exam;
+import com.dynast.examportal.dto.ExamDto;
 import com.dynast.examportal.service.ExamService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class ExamController extends ApplicationController {
     })
     @PostMapping("create")
 //    @PreAuthorize("hasRole('Admin')")
-    public Exam createExam(@ApiParam(name = "Exam", required = true)@RequestBody Exam exam) {
+    public ExamDto createExam(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
         exam.setUpdatedBy(getUser());
         return examService.create(exam);
     }
@@ -33,7 +33,7 @@ public class ExamController extends ApplicationController {
     })
     @PutMapping("update")
 //    @PreAuthorize("hasRole('Admin')")
-    public Exam updateExam(@ApiParam(name = "Exam", required = true)@RequestBody Exam exam) {
+    public ExamDto updateExam(@ApiParam(name = "exam", required = true)@RequestBody ExamDto exam) {
         exam.setUpdatedBy(getUser());
         return examService.update(exam);
     }
@@ -45,8 +45,8 @@ public class ExamController extends ApplicationController {
     })
     @DeleteMapping("{examId}")
 //    @PreAuthorize("hasRole('Admin')")
-    public Exam deleteExam(@ApiParam(name = "Exam Id", required = true)@PathVariable String examId) {
-        return examService.delete(examId);
+    public void deleteExam(@ApiParam(name = "examId", required = true)@PathVariable String examId) {
+        examService.delete(examId);
     }
 
     @ApiOperation(value = "This is used to get list of Exmas", notes = "")
@@ -55,7 +55,7 @@ public class ExamController extends ApplicationController {
             @ApiResponse(code = 404, message = "No data found")
     })
     @GetMapping("all")
-    public Iterable<Exam> getAllExam() {
+    public Iterable<ExamDto> getAllExam() {
         return examService.getAll();
     }
 
@@ -65,7 +65,7 @@ public class ExamController extends ApplicationController {
             @ApiResponse(code = 404, message = "No data found")
     })
     @GetMapping("{examId}")
-    public Exam getOneExam(@ApiParam(name = "Exam Id", required = true)@PathVariable String examId) {
+    public ExamDto getOneExam(@ApiParam(name = "examId", required = true)@PathVariable String examId) {
         return examService.getOne(examId);
     }
 

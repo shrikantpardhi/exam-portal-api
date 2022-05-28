@@ -1,5 +1,6 @@
 package com.dynast.examportal.service;
 
+import com.dynast.examportal.dto.ExamDto;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.Exam;
@@ -8,9 +9,13 @@ import com.dynast.examportal.model.Subject;
 import com.dynast.examportal.repository.ExamCategoryRepository;
 import com.dynast.examportal.repository.ExamRepository;
 import com.dynast.examportal.repository.SubjectRepository;
+import com.dynast.examportal.util.ObjectMapperSingleton;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,19 +30,22 @@ public class ExamService {
     @Autowired
     private ExamCategoryRepository examCategoryRepository;
 
-    public Exam create(Exam exam) {
-        Optional<Subject> subject = subjectRepository.findById(exam.getSubject().getSubjectId());
-        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategory().getExamCategoryId()).orElseThrow(
+    ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public ExamDto create(ExamDto exam) {
+        Optional<Subject> subject = subjectRepository.findById(exam.getSubjectDto().getSubjectId());
+        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategoryDto().getExamCategoryId()).orElseThrow(
                 () -> new NotFoundException("Could  not find exam category!")
         );
-        exam.setSubject(subject.get());
-        exam.setExamCategory(examCategory);
-        return examRepository.save(exam);
+        Exam e = mapper.convertValue(exam, Exam.class);
+        e.setSubject(subject.get());
+        e.setExamCategory(examCategory);
+        return mapper.convertValue(examRepository.save(e), ExamDto.class);
     }
 
-    public Exam update(Exam exam) {
-        Optional<Subject> subject = subjectRepository.findById(exam.getSubject().getSubjectId());
-        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategory().getExamCategoryId()).orElseThrow(
+    public ExamDto update(ExamDto exam) {
+        Optional<Subject> subject = subjectRepository.findById(exam.getSubjectDto().getSubjectId());
+        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategoryDto().getExamCategoryId()).orElseThrow(
                 () -> new NotFoundException("Could  not find exam category!")
         );
         return examRepository.findById(exam.getExamId()).map(
@@ -52,24 +60,29 @@ public class ExamService {
                     exam1.setIsNegativeAllowed(exam.getIsNegativeAllowed());
                     exam1.setIsPaid(exam.getIsPaid());
                     exam1.setUpdatedBy(exam.getUpdatedBy());
-                    return examRepository.save(exam1);
+                    return  mapper.convertValue(examRepository.save(exam1), ExamDto.class);
                 }
         ).orElseThrow(
                 () -> new UnprocessableEntityException("Unable to update Exam" + exam.getExamTitle())
         );
     }
 
-    public Exam delete(String examId) {
+    public void delete(String examId) {
         Optional<Exam> exam = examRepository.findById(examId);
         examRepository.delete(exam.get());
-        return exam.get();
     }
 
-    public Iterable<Exam> getAll() {
-        return examRepository.findAll();
+    public Iterable<ExamDto> getAll() {
+        Iterable<Exam> exams = examRepository.findAll();
+        List<ExamDto> examDtoList = new ArrayList<>();
+        exams.forEach(
+                exam -> examDtoList.add(mapper.convertValue(exam, ExamDto.class))
+        );
+        return examDtoList;
     }
 
-    public Exam getOne(String examId) {
-        return examRepository.findById(examId).orElseThrow(() -> new NotFoundException("Could not find Exam!"));
+    public ExamDto getOne(String examId) {
+        Exam exam =  examRepository.findById(examId).orElseThrow(() -> new NotFoundException("Could not find Exam!"));
+        return mapper.convertValue(exam, ExamDto.class);
     }
 }

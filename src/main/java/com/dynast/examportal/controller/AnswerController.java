@@ -1,7 +1,7 @@
 package com.dynast.examportal.controller;
 
+import com.dynast.examportal.dto.AnswerDto;
 import com.dynast.examportal.exception.DataBaseException;
-import com.dynast.examportal.model.Answer;
 import com.dynast.examportal.service.AnswerService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class AnswerController {
             @ApiResponse(code = 422, message = "Not found - The answers was not found for the question")
     })
     @GetMapping("{questionId}")
-    public Iterable<Answer> getByQuestion(@ApiParam(name = "Question Id", required = true)@PathVariable String questionId) {
+    public Iterable<AnswerDto> getByQuestion(@ApiParam(name = "questionId", required = true)@PathVariable String questionId) {
         return answerService.getAllByQuestion(questionId);
     }
 
@@ -30,7 +30,7 @@ public class AnswerController {
             @ApiResponse(code = 422, message = "Not found - The answer was not found")
     })
     @GetMapping("{answerId}")
-    public Answer getByAnswer(@ApiParam(name = "Answer Id", required = true)@PathVariable String answerId) {
+    public AnswerDto getByAnswer(@ApiParam(name = "answerId", required = true)@PathVariable String answerId) {
         return answerService.getByAnswerId(answerId);
     }
 
@@ -40,7 +40,7 @@ public class AnswerController {
             @ApiResponse(code = 422, message = "Unable to process request")
     })
     @PostMapping("create")
-    public Answer create(@ApiParam(name = "Answer", required = true)@RequestBody Answer answer) {
+    public AnswerDto create(@ApiParam(name = "answer", required = true)@RequestBody AnswerDto answer) {
         return answerService.create(answer);
     }
 
@@ -50,7 +50,7 @@ public class AnswerController {
             @ApiResponse(code = 422, message = "Unable to process request")
     })
     @PutMapping("update")
-    public Answer update(@ApiParam(name = "Answer", required = true)@RequestBody Answer answer) throws DataBaseException {
+    public AnswerDto update(@ApiParam(name = "answer", required = true)@RequestBody AnswerDto answer) throws DataBaseException {
         return answerService.update(answer);
     }
 
@@ -60,7 +60,7 @@ public class AnswerController {
             @ApiResponse(code = 404, message = "Not found - The answer was not found")
     })
     @DeleteMapping("{answerId}")
-    public void delete(@ApiParam(name = "Answer Id", required = true)@PathVariable String answerId) throws DataBaseException {
+    public void delete(@ApiParam(name = "answerId", required = true)@PathVariable String answerId) throws DataBaseException {
         answerService.delete(answerId);
     }
 }

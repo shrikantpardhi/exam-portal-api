@@ -1,16 +1,20 @@
 package com.dynast.examportal.service;
 
+import com.dynast.examportal.dto.UserDto;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.model.Role;
 import com.dynast.examportal.model.User;
 import com.dynast.examportal.repository.RoleRepository;
 import com.dynast.examportal.repository.UserRepository;
+import com.dynast.examportal.util.ObjectMapperSingleton;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -28,6 +32,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    ObjectMapper mapper = ObjectMapperSingleton.getInstance();
 
     public void initRoleAndUser() {
 
@@ -53,26 +58,25 @@ public class UserService {
         userRepository.save(adminUser);
     }
 
-    public Iterable<User> getAllUser() {
-
-        return userRepository.findAll();
+    public Iterable<UserDto> getAllUser() {
+        Iterable<User> users = userRepository.findAll();
+        List<UserDto> userDtos = new ArrayList<>();
+        users.forEach(
+                user -> userDtos.add(mapper.convertValue(user, UserDto.class))
+        );
+        return userDtos;
     }
 
-    public User registerNewUser(User user) {
-        Role role = roleRepository.findById("User").get();
-        Set<Role> userRoles = new HashSet<>();
-        userRoles.add(role);
-        user.setRole(userRoles);
-        user.setUserPassword(getEncodedPassword(user.getUserPassword()));
-        return userRepository.save(user);
+    public UserDto registerNewUser(UserDto user) {
+        return getCreateUserDto(user);
     }
 
     public String getEncodedPassword(String password) {
         return passwordEncoder.encode(password);
     }
 
-    public Optional<User> updateUser(User user) {
-        return Optional.ofNullable(userRepository.findById(userUtil.getUsername()).map(u -> {
+    public UserDto updateUser(UserDto user) {
+        return userRepository.findById(userUtil.getUsername()).map(u -> {
             u.setUserFirstName(user.getUserFirstName());
             u.setUserLastName(user.getUserLastName());
             u.setEmail(user.getEmail());
@@ -81,18 +85,27 @@ public class UserService {
             u.setUserAddress(user.getUserAddress());
             u.setUserCity(user.getUserCity());
             u.setUserImage(user.getUserImage());
-            return userRepository.save(u);
-        }).orElseGet(() -> {
-            user.setUserName(userUtil.getUsername());
-            return userRepository.save(user);
-        }));//.orElseThrow(() -> new UserCreationFailedException(user.toString()));
+            return mapper.convertValue(userRepository.save(u), UserDto.class);
+        }).orElseGet(() -> getCreateUserDto(user));
     }
 
-    public User fetchUser(String emailId) {
-        return userRepository.findByEmail(emailId).orElseThrow(() -> new NotFoundException(emailId));
+    private UserDto getCreateUserDto(UserDto user) {
+        Role role = roleRepository.findById("User").get();
+        User u = mapper.convertValue(user, User.class);
+        Set<Role> userRoles = new HashSet<>();
+        userRoles.add(role);
+        u.setRole(userRoles);
+        u.setUserPassword(getEncodedPassword(user.getUserPassword()));
+        return mapper.convertValue(userRepository.save(u), UserDto.class);
     }
 
-    public User getUserDetail(String userName) {
-        return userRepository.findByUserName(userName).orElseThrow(() -> new NotFoundException(userName));
+    public UserDto fetchUser(String emailId) {
+        User user = userRepository.findByEmail(emailId).orElseThrow(() -> new NotFoundException(emailId));
+        return mapper.convertValue(user, UserDto.class);
+    }
+
+    public UserDto getUserDetail(String userName) {
+        User user = userRepository.findByUserName(userName).orElseThrow(() -> new NotFoundException(userName));
+        return mapper.convertValue(user, UserDto.class);
     }
 }
