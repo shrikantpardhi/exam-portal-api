@@ -1,6 +1,8 @@
 package com.dynast.examportal.service;
 
+import com.dynast.examportal.dto.ExamCategoryDto;
 import com.dynast.examportal.dto.ExamDto;
+import com.dynast.examportal.dto.SubjectDto;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.Exam;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ExamService {
@@ -34,58 +35,72 @@ public class ExamService {
         this.examCategoryRepository = examCategoryRepository;
     }
 
-    public ExamDto create(ExamDto exam) {
-        Optional<Subject> subject = subjectRepository.findById(exam.getSubjectDto().getSubjectId());
-        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategoryDto().getExamCategoryId()).orElseThrow(
-                () -> new NotFoundException("Could  not find exam category!")
-        );
-        Exam e = mapper.convertValue(exam, Exam.class);
-        e.setSubject(subject.orElse(null));
-        e.setExamCategory(examCategory);
-        return mapper.convertValue(examRepository.save(e), ExamDto.class);
+    public ExamDto create(ExamDto examDto) {
+        return saveExamAndReturnDto(examDto, new Exam());
     }
 
-    public ExamDto update(ExamDto exam) {
-        Optional<Subject> subject = subjectRepository.findById(exam.getSubjectDto().getSubjectId());
-        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategoryDto().getExamCategoryId()).orElseThrow(
-                () -> new NotFoundException("Could  not find exam category!")
-        );
-        return examRepository.findById(exam.getExamId()).map(
-                exam1 -> {
-                    exam1.setExamTitle(exam.getExamTitle());
-                    exam1.setExamDescription(exam.getExamDescription());
-                    exam1.setSubject(subject.orElse(null));
-                    exam1.setExamCategory(examCategory);
-                    exam1.setTotalMark(exam.getTotalMark());
-                    exam1.setExamEndDate(exam.getExamEndDate());
-                    exam1.setExamDuration(exam.getExamDuration());
-                    exam1.setIsNegativeAllowed(exam.getIsNegativeAllowed());
-                    exam1.setIsPaid(exam.getIsPaid());
-                    exam1.setUpdatedBy(exam.getUpdatedBy());
-                    return mapper.convertValue(examRepository.save(exam1), ExamDto.class);
-                }
+
+    public ExamDto update(ExamDto examDto) {
+        return examRepository.findById(examDto.getExamId()).map(
+                exam -> saveExamAndReturnDto(examDto, exam)
         ).orElseThrow(
-                () -> new UnprocessableEntityException("Unable to update Exam" + exam.getExamTitle())
+                () -> new UnprocessableEntityException("Unable to update Exam" + examDto.getExamTitle())
         );
     }
 
     public void delete(String examId) {
-        Optional<Exam> exam = examRepository.findById(examId);
-        assert exam.orElse(null) != null;
-        examRepository.delete(exam.orElse(null));
+        examRepository.findById(examId).ifPresent(
+                examRepository::delete
+        );
     }
 
     public Iterable<ExamDto> getAll() {
         Iterable<Exam> exams = examRepository.findAll();
         List<ExamDto> examDtoList = new ArrayList<>();
         exams.forEach(
-                exam -> examDtoList.add(mapper.convertValue(exam, ExamDto.class))
+                exam -> examDtoList.add(getExamDto(exam))
         );
         return examDtoList;
     }
 
     public ExamDto getOne(String examId) {
         Exam exam = examRepository.findById(examId).orElseThrow(() -> new NotFoundException("Could not find Exam!"));
-        return mapper.convertValue(exam, ExamDto.class);
+        return getExamDto(exam);
+    }
+
+    private ExamDto getExamDto(Exam exam) {
+        Subject subject = subjectRepository.findById(exam.getSubject().getSubjectId()).orElseThrow(
+                () -> new NotFoundException("Could  not find subject!")
+        );
+        ExamCategory examCategory = examCategoryRepository.findById(exam.getExamCategory().getExamCategoryId()).orElseThrow(
+                () -> new NotFoundException("Could  not find exam category!")
+        );
+        ExamDto examDto = mapper.convertValue(examRepository.save(exam), ExamDto.class);
+        examDto.setSubjectDto(mapper.convertValue(subject, SubjectDto.class));
+        examDto.setExamCategoryDto(mapper.convertValue(examCategory, ExamCategoryDto.class));
+        return examDto;
+    }
+
+    private ExamDto saveExamAndReturnDto(ExamDto examDto, Exam exam) {
+        Subject subject = subjectRepository.findById(examDto.getSubjectDto().getSubjectId()).orElseThrow(
+                () -> new NotFoundException("Could  not find subject!")
+        );
+        ExamCategory examCategory = examCategoryRepository.findById(examDto.getExamCategoryDto().getExamCategoryId()).orElseThrow(
+                () -> new NotFoundException("Could  not find exam category!")
+        );
+        exam.setExamTitle(exam.getExamTitle());
+        exam.setExamDescription(exam.getExamDescription());
+        exam.setSubject(subject);
+        exam.setExamCategory(examCategory);
+        exam.setTotalMark(exam.getTotalMark());
+        exam.setExamEndDate(exam.getExamEndDate());
+        exam.setExamDuration(exam.getExamDuration());
+        exam.setIsNegativeAllowed(exam.getIsNegativeAllowed());
+        exam.setIsPaid(exam.getIsPaid());
+        exam.setUpdatedBy(exam.getUpdatedBy());
+        ExamDto examDto1 = mapper.convertValue(examRepository.save(exam), ExamDto.class);
+        examDto1.setSubjectDto(mapper.convertValue(subject, SubjectDto.class));
+        examDto.setExamCategoryDto(mapper.convertValue(examCategory, ExamCategoryDto.class));
+        return examDto1;
     }
 }

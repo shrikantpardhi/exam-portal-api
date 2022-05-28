@@ -21,7 +21,7 @@ public class AnswerController {
             @ApiResponse(code = 200, message = "Data fetched successful"),
             @ApiResponse(code = 422, message = "Not found - The answers was not found for the question")
     })
-    @GetMapping("{questionId}")
+    @GetMapping("question/{questionId}")
     public Iterable<AnswerDto> getByQuestion(@ApiParam(name = "questionId", required = true) @PathVariable String questionId) {
         return answerService.getAllByQuestion(questionId);
     }
@@ -31,7 +31,7 @@ public class AnswerController {
             @ApiResponse(code = 200, message = "Data fetched successful"),
             @ApiResponse(code = 422, message = "Not found - The answer was not found")
     })
-    @GetMapping("{answerId}")
+    @GetMapping("get/{answerId}")
     public AnswerDto getByAnswer(@ApiParam(name = "answerId", required = true) @PathVariable String answerId) {
         return answerService.getByAnswerId(answerId);
     }

@@ -25,9 +25,9 @@ public class ExamCategoryService {
     }
 
     public void delete(String examCategoryId) throws DataBaseException {
-        Optional<ExamCategory> examCategory = Optional.ofNullable(examCategoryRepository.findById(examCategoryId)
-                .orElseThrow(() -> new NotFoundException("Could not find Exam Category!")));
-        examCategoryRepository.delete(examCategory.orElse(null));
+        examCategoryRepository.findById(examCategoryId).ifPresent(
+                examCategoryRepository::delete
+        );
     }
 
     public ExamCategoryDto update(ExamCategoryDto examCategory) {

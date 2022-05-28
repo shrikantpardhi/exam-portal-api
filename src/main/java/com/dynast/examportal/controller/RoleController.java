@@ -11,7 +11,7 @@ import javax.validation.Valid;
 @RestController
 @Api(value = "Role APIs", tags = {"Role Controller"})
 @RequestMapping(value = "/api/v1/role/")
-public class RoleController {
+public class RoleController extends ApplicationController {
     private final RoleService roleService;
 
     public RoleController(RoleService roleService) {
@@ -26,6 +26,7 @@ public class RoleController {
     @PostMapping({"/create"})
     @PreAuthorize("hasRole('Admin')")
     public Role createNewRole(@ApiParam(name = "Role", required = true) @Valid @RequestBody Role role) {
+        role.setUpdatedBy(getUser());
         return roleService.createNewRole(role);
     }
 

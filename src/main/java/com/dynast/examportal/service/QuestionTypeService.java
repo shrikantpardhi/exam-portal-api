@@ -34,9 +34,14 @@ public class QuestionTypeService {
 
     public QuestionTypeDto update(QuestionTypeDto questionType) {
         QuestionType qType = questionTypeRepository.findById(questionType.getQuestionTypeId())
-                .map(questionType1 -> questionTypeRepository.save(questionType1)).orElseThrow(
-                        () -> new UnprocessableEntityException("Unable to process Question Type " + questionType.getQuestionTypeName())
-                );
+            .map(questionType1 -> {
+                questionType1.setQuestionTypeName(questionType.getQuestionTypeName());
+                questionType1.setQuestionTypeCode(questionType.getQuestionTypeCode());
+                return questionTypeRepository.save(questionType1);
+            })
+            .orElseThrow(
+                () -> new UnprocessableEntityException("Unable to process Question Type " + questionType.getQuestionTypeName())
+            );
         return mapper.convertValue(qType, QuestionTypeDto.class);
     }
 

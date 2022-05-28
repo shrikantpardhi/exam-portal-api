@@ -53,8 +53,9 @@ public class SubjectService {
     }
 
     public void deleteSubjectById(String id) {
-        Optional<Subject> sub = subjectRepository.findById(id);
-        subjectRepository.delete(sub.orElse(null));
+       subjectRepository.findById(id).ifPresent(
+                subjectRepository::delete
+        );
     }
 
     public SubjectDto getSubjectById(String id) {

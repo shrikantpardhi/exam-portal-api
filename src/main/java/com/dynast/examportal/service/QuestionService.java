@@ -1,6 +1,9 @@
 package com.dynast.examportal.service;
 
+import com.dynast.examportal.dto.ExamDto;
 import com.dynast.examportal.dto.QuestionDto;
+import com.dynast.examportal.dto.QuestionTypeDto;
+import com.dynast.examportal.dto.SubjectDto;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.Exam;
@@ -39,35 +42,22 @@ public class QuestionService {
         this.questionTypeRepository = questionTypeRepository;
     }
 
-    public QuestionDto create(QuestionDto question) {
-        Optional<Subject> subject = subjectRepository.findById(question.getSubjectDto().getSubjectId());
-        Optional<Exam> exam = examRepository.findById(question.getExamDto().getExamId());
-        Optional<QuestionType> questionType = questionTypeRepository.findById(question.getQuestionTypeDto().getQuestionTypeId());
-        Question que = mapper.convertValue(question, Question.class);
-        que.setSubject(subject.orElse(null));
-        que.setExam(exam.orElse(null));
-        que.setQuestionType(questionType.orElse(null));
-        return mapper.convertValue(questionRepository.save(que), QuestionDto.class);
+    public QuestionDto create(QuestionDto questionDto) {
+        Subject subject = getSubject(questionDto);
+        Exam exam = getExam(questionDto);
+        QuestionType questionType = getQuestionType(questionDto);
+        Question question = createQuestion(subject, exam, questionType, questionDto);
+        return toQuestionDto(questionRepository.save(question));
     }
 
-    public QuestionDto update(QuestionDto question) {
-        Optional<Subject> subject = subjectRepository.findById(question.getSubjectDto().getSubjectId());
-        Optional<Exam> exam = examRepository.findById(question.getExamDto().getExamId());
-        Optional<QuestionType> questionType = questionTypeRepository.findById(question.getQuestionTypeDto().getQuestionTypeId());
-        return questionRepository.findById(question.getQuestionId()).map(
+    public QuestionDto update(QuestionDto questionDto) {
+        Subject subject = getSubject(questionDto);
+        Exam exam = getExam(questionDto);
+        QuestionType questionType = getQuestionType(questionDto);
+        return questionRepository.findById(questionDto.getQuestionId()).map(
                 question1 -> {
-                    question1.setExam(exam.orElse(null));
-                    question1.setSubject(subject.orElse(null));
-                    question1.setQuestionType(questionType.orElse(null));
-                    question1.setQuestionTitle(question.getQuestionTitle());
-                    question1.setQuestionDescription(question.getQuestionDescription());
-                    question1.setQuestionAnswerDescription(question.getQuestionAnswerDescription());
-                    question1.setQuestionImage(question.getQuestionImage());
-                    question1.setQuestionAnswerDescriptionImage(question.getQuestionAnswerDescriptionImage());
-                    question1.setQuestionMark(question.getQuestionMark());
-                    question1.setIsNegativeAllowed(question.getIsNegativeAllowed());
-                    question1.setUpdatedBy(question.getUpdatedBy());
-                    return mapper.convertValue(questionRepository.save(question1), QuestionDto.class);
+                    question1 = createQuestion(subject, exam, questionType, questionDto);
+                    return toQuestionDto(questionRepository.save(question1));
                 }
         ).orElseThrow(() -> new UnprocessableEntityException("Could not able to process request!"));
     }
@@ -85,14 +75,14 @@ public class QuestionService {
                 .orElseThrow(
                         () -> new NotFoundException("Could not find Question")
                 );
-        return mapper.convertValue(question, QuestionDto.class);
+        return toQuestionDto(question);
     }
 
     public Iterable<QuestionDto> getAllQuestion() {
         Iterable<Question> questions = questionRepository.findAll();
         List<QuestionDto> questionDtoList = new ArrayList<>();
         questions.forEach(
-                question -> questionDtoList.add(mapper.convertValue(question, QuestionDto.class))
+                question -> questionDtoList.add(toQuestionDto(question))
         );
         return questionDtoList;
     }
@@ -104,7 +94,7 @@ public class QuestionService {
         Iterable<Question> questions = questionRepository.findByExam(exam);
         List<QuestionDto> questionDtoList = new ArrayList<>();
         questions.forEach(
-                question -> questionDtoList.add(mapper.convertValue(question, QuestionDto.class))
+                question -> questionDtoList.add(toQuestionDto(question))
         );
         return questionDtoList;
     }
@@ -116,8 +106,42 @@ public class QuestionService {
         Iterable<Question> questions = questionRepository.findBySubject(subject);
         List<QuestionDto> questionDtoList = new ArrayList<>();
         questions.forEach(
-                question -> questionDtoList.add(mapper.convertValue(question, QuestionDto.class))
+                question -> questionDtoList.add(toQuestionDto(question))
         );
         return questionDtoList;
+    }
+
+    private QuestionDto toQuestionDto(Question question) {
+        QuestionDto questionDto = mapper.convertValue(question, QuestionDto.class);
+        questionDto.setSubjectDto(mapper.convertValue(question.getSubject(), SubjectDto.class));
+        questionDto.setQuestionTypeDto(mapper.convertValue(question.getQuestionType(), QuestionTypeDto.class));
+        questionDto.setExamDto(mapper.convertValue(question.getExam(), ExamDto.class));
+        return questionDto;
+    }
+
+    private Question createQuestion(Subject subject, Exam exam, QuestionType questionType, QuestionDto questionDto) {
+        Question que = mapper.convertValue(questionDto, Question.class);
+        que.setSubject(subject);
+        que.setExam(exam);
+        que.setQuestionType(questionType);
+        return que;
+    }
+
+    private QuestionType getQuestionType(QuestionDto questionDto) {
+        return questionTypeRepository.findById(questionDto.getQuestionTypeDto().getQuestionTypeId()).orElseThrow(
+                () -> new NotFoundException("Could not find QuestionType")
+        );
+    }
+
+    private Exam getExam(QuestionDto questionDto) {
+        return examRepository.findById(questionDto.getExamDto().getExamId()).orElseThrow(
+                () -> new NotFoundException("Could not find Exam")
+        );
+    }
+
+    private Subject getSubject(QuestionDto questionDto) {
+        return subjectRepository.findById(questionDto.getSubjectDto().getSubjectId()).orElseThrow(
+                () -> new NotFoundException("Could not find Subject")
+        );
     }
 }

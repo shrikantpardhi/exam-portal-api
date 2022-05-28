@@ -1,6 +1,8 @@
 package com.dynast.examportal.model;
 
 import com.dynast.examportal.util.AbstractTimestampEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,17 +28,17 @@ public class Question extends AbstractTimestampEntity implements Serializable {
 //    @Column(name="QUE_ID")
     private String questionId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "questionExamId", referencedColumnName = "examId")
     private Exam exam;
 
     @NotNull(message = "Subject is Mandatory")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "subjectId", referencedColumnName = "subjectId")
     private Subject subject;
 
     @NotNull(message = "Question Type is Mandatory")
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "questionTypeId", referencedColumnName = "questionTypeId")
     private QuestionType questionType;
 

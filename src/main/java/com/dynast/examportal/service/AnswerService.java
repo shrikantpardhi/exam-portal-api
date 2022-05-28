@@ -1,6 +1,7 @@
 package com.dynast.examportal.service;
 
 import com.dynast.examportal.dto.AnswerDto;
+import com.dynast.examportal.dto.QuestionDto;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.Answer;
@@ -33,43 +34,45 @@ public class AnswerService {
     }
 
     public AnswerDto update(AnswerDto answer) {
-        Question question = questionRepository.findById(answer.getQuestionDto().getQuestionId()).orElseThrow(
-                () -> new NotFoundException("Could Not find Question")
-        );
         return answerRepository.findById(answer.getAnswerId()).map(ans -> {
-            ans.setAnswerText(answer.getAnswerText());
-            ans.setQuestion(question);
-            ans.setAnswerImage(answer.getAnswerImage());
-            ans.setIsCorrect(answer.getIsCorrect());
-            return mapper.convertValue(answerRepository.save(ans), AnswerDto.class);
+            ans = createAnswer(answer);
+            return toAnswerDto(answerRepository.save(ans));
         }).orElseThrow(
                 () -> new UnprocessableEntityException("Unable to update answer")
         );
     }
 
     public AnswerDto create(AnswerDto answer) {
-        Answer ans = mapper.convertValue(answer, Answer.class);
-        return mapper.convertValue(ans, AnswerDto.class);
+        Answer ans = createAnswer(answer);
+        return toAnswerDto(answerRepository.save(ans));
     }
-
-//    public AnswerDto getByQuestion(String questionId, String answerId) {
-//        Optional<Question> question = questionRepository.findById(questionId);
-//        return answerRepository.findByAnswerIdAndQuestion(answerId, question.get().getQuestionId()).orElseThrow(
-//                () -> new NotFoundException("")
-//        );
-//    }
 
     public Iterable<AnswerDto> getAllByQuestion(String questionId) {
         Iterable<Answer> answers = answerRepository.findAllByQuestionId(questionId);
         List<AnswerDto> answerDtoList = new ArrayList<>();
         answers.forEach(
-                answer -> answerDtoList.add(mapper.convertValue(answer, AnswerDto.class))
+                answer -> answerDtoList.add(toAnswerDto(answer))
         );
         return answerDtoList;
     }
 
     public AnswerDto getByAnswerId(String answerId) {
-        Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new NotFoundException("Answer not found with Id " + answerId));
-        return mapper.convertValue(answer, AnswerDto.class);
+        Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new NotFoundException("Answer not found"));
+        return toAnswerDto(answer);
+    }
+
+    private AnswerDto toAnswerDto(Answer ans) {
+        AnswerDto answerDto = mapper.convertValue(ans, AnswerDto.class);
+        answerDto.setQuestionDto(mapper.convertValue(ans.getQuestion(), QuestionDto.class));
+        return answerDto;
+    }
+
+    private Answer createAnswer(AnswerDto answerDto) {
+        Question question = questionRepository.findById(answerDto.getQuestionDto().getQuestionId()).orElseThrow(
+                () -> new NotFoundException("Could not find the question")
+        );
+        Answer answer = mapper.convertValue(answerDto, Answer.class);
+        answer.setQuestion(question);
+        return answer;
     }
 }

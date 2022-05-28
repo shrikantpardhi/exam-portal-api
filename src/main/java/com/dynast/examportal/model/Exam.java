@@ -1,6 +1,7 @@
 package com.dynast.examportal.model;
 
 import com.dynast.examportal.util.AbstractTimestampEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,11 +21,13 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String examId;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
+//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @JoinColumn(name = "subjectId", referencedColumnName = "subjectId")
     private Subject subject;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
+//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @JoinColumn(name = "examCategoryId", referencedColumnName = "examCategoryId")
     private ExamCategory examCategory;
 

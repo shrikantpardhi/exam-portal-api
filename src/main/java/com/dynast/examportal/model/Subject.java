@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -30,6 +31,7 @@ public class Subject extends AbstractTimestampEntity implements Serializable {
     private String subjectId;
 
     @NotBlank(message = "Subject title is mandatory")
+    @Column(unique = true)
     private String title;
 
     private String description;

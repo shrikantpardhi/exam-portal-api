@@ -15,4 +15,6 @@ public class QuestionTypeDto implements Serializable {
     private String questionTypeId;
 
     private String questionTypeName;
+
+    private String questionTypeCode;
 }
