@@ -8,7 +8,6 @@ import com.dynast.examportal.model.ExamCategory;
 import com.dynast.examportal.repository.ExamCategoryRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,15 +16,18 @@ import java.util.Optional;
 
 @Service
 public class ExamCategoryService {
-    @Autowired
-    private ExamCategoryRepository examCategoryRepository;
+    private final ExamCategoryRepository examCategoryRepository;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public ExamCategoryService(ExamCategoryRepository examCategoryRepository) {
+        this.examCategoryRepository = examCategoryRepository;
+    }
 
     public void delete(String examCategoryId) throws DataBaseException {
         Optional<ExamCategory> examCategory = Optional.ofNullable(examCategoryRepository.findById(examCategoryId)
                 .orElseThrow(() -> new NotFoundException("Could not find Exam Category!")));
-        examCategoryRepository.delete(examCategory.get());
+        examCategoryRepository.delete(examCategory.orElse(null));
     }
 
     public ExamCategoryDto update(ExamCategoryDto examCategory) {
@@ -52,7 +54,7 @@ public class ExamCategoryService {
 
     public Iterable<ExamCategoryDto> findAll() {
         Iterable<ExamCategory> examCategories = examCategoryRepository.findAll();
-        List<ExamCategoryDto> examCategoryDtoList = new ArrayList<ExamCategoryDto>();
+        List<ExamCategoryDto> examCategoryDtoList = new ArrayList<>();
         examCategories.forEach(
                 examCategory ->
                         examCategoryDtoList.add(mapper.convertValue(examCategory, ExamCategoryDto.class))

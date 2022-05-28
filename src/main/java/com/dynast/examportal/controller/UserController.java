@@ -7,7 +7,6 @@ import com.dynast.examportal.model.JwtResponse;
 import com.dynast.examportal.service.JwtService;
 import com.dynast.examportal.service.UserService;
 import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +14,14 @@ import org.springframework.web.bind.annotation.*;
 @Api(value = "All user profile related APIs", tags = {"User Controller"})
 @RequestMapping(value = "/api/v1/user/")
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+
+    public UserController(UserService userService, JwtService jwtService) {
+        this.userService = userService;
+        this.jwtService = jwtService;
+    }
 
     //	@PostConstruct
 //    public void initRoleAndUser() {

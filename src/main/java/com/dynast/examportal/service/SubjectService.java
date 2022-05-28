@@ -8,7 +8,6 @@ import com.dynast.examportal.repository.SubjectRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.dynast.examportal.util.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,13 +16,16 @@ import java.util.Optional;
 
 @Service
 public class SubjectService {
-    @Autowired
-    private SubjectRepository subjectRepository;
+    private final SubjectRepository subjectRepository;
 
-    @Autowired
-    private User user;
+    private final User user;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public SubjectService(SubjectRepository subjectRepository, User user) {
+        this.subjectRepository = subjectRepository;
+        this.user = user;
+    }
 
     public SubjectDto createNewSubject(SubjectDto subject) {
         subject.setUpdatedBy(user.getUsername());
@@ -52,7 +54,7 @@ public class SubjectService {
 
     public void deleteSubjectById(String id) {
         Optional<Subject> sub = subjectRepository.findById(id);
-        subjectRepository.delete(sub.get());
+        subjectRepository.delete(sub.orElse(null));
     }
 
     public SubjectDto getSubjectById(String id) {

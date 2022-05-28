@@ -7,7 +7,6 @@ import com.dynast.examportal.model.QuestionType;
 import com.dynast.examportal.repository.QuestionTypeRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,10 +15,13 @@ import java.util.Optional;
 
 @Service
 public class QuestionTypeService {
-    @Autowired
-    private QuestionTypeRepository questionTypeRepository;
+    private final QuestionTypeRepository questionTypeRepository;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public QuestionTypeService(QuestionTypeRepository questionTypeRepository) {
+        this.questionTypeRepository = questionTypeRepository;
+    }
 
     public Iterable<QuestionTypeDto> getAll() {
         Iterable<QuestionType> questionTypes = questionTypeRepository.findAll();
@@ -41,7 +43,7 @@ public class QuestionTypeService {
     public void deleteById(String questionTypeId) {
         Optional<QuestionType> questionType = Optional.ofNullable(questionTypeRepository.findById(questionTypeId)
                 .orElseThrow(() -> new NotFoundException("Could not find Exam Category!")));
-        questionTypeRepository.delete(questionType.get());
+        questionTypeRepository.delete(questionType.orElse(null));
     }
 
     public QuestionTypeDto getById(String questionTypeId) {

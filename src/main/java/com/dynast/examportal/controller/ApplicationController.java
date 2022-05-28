@@ -1,13 +1,18 @@
 package com.dynast.examportal.controller;
 
 import com.dynast.examportal.util.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ApplicationController {
-    @Autowired
-    private User user;
+    private final User user;
+
+    public ApplicationController(User user) {
+        this.user = user;
+    }
+
+    public ApplicationController() {
+    }
 
     public String getUser() {
         return user.getUsername();

@@ -7,7 +7,6 @@ import com.dynast.examportal.model.UserResult;
 import com.dynast.examportal.repository.UserResultRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,10 +15,13 @@ import java.util.List;
 @Service
 public class UserResultService {
 
-    @Autowired
-    private UserResultRepository userResultRepository;
+    private final UserResultRepository userResultRepository;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public UserResultService(UserResultRepository userResultRepository) {
+        this.userResultRepository = userResultRepository;
+    }
 
     public Iterable<UserResultDto> getAll() {
         Iterable<UserResult> userResults = userResultRepository.findAll();

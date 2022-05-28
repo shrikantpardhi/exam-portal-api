@@ -3,7 +3,6 @@ package com.dynast.examportal.controller;
 import com.dynast.examportal.model.Role;
 import com.dynast.examportal.service.RoleService;
 import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +12,13 @@ import javax.validation.Valid;
 @Api(value = "Role APIs", tags = {"Role Controller"})
 @RequestMapping(value = "/api/v1/role/")
 public class RoleController {
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
-    @ApiOperation(value = "This is used to create a Role", notes = "")
+    public RoleController(RoleService roleService) {
+        this.roleService = roleService;
+    }
+
+    @ApiOperation(value = "This is used to create a Role")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created"),
             @ApiResponse(code = 422, message = "failed to create")
@@ -27,7 +29,7 @@ public class RoleController {
         return roleService.createNewRole(role);
     }
 
-    @ApiOperation(value = "This is used to get all Role", notes = "")
+    @ApiOperation(value = "This is used to get all Role")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully fetched"),
             @ApiResponse(code = 404, message = "No data found")

@@ -11,7 +11,6 @@ import com.dynast.examportal.repository.ExamRepository;
 import com.dynast.examportal.repository.SubjectRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,16 +20,19 @@ import java.util.Optional;
 @Service
 public class ExamService {
 
-    @Autowired
-    private ExamRepository examRepository;
+    private final ExamRepository examRepository;
 
-    @Autowired
-    private SubjectRepository subjectRepository;
+    private final SubjectRepository subjectRepository;
 
-    @Autowired
-    private ExamCategoryRepository examCategoryRepository;
+    private final ExamCategoryRepository examCategoryRepository;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public ExamService(ExamRepository examRepository, SubjectRepository subjectRepository, ExamCategoryRepository examCategoryRepository) {
+        this.examRepository = examRepository;
+        this.subjectRepository = subjectRepository;
+        this.examCategoryRepository = examCategoryRepository;
+    }
 
     public ExamDto create(ExamDto exam) {
         Optional<Subject> subject = subjectRepository.findById(exam.getSubjectDto().getSubjectId());
@@ -38,7 +40,7 @@ public class ExamService {
                 () -> new NotFoundException("Could  not find exam category!")
         );
         Exam e = mapper.convertValue(exam, Exam.class);
-        e.setSubject(subject.get());
+        e.setSubject(subject.orElse(null));
         e.setExamCategory(examCategory);
         return mapper.convertValue(examRepository.save(e), ExamDto.class);
     }
@@ -52,7 +54,7 @@ public class ExamService {
                 exam1 -> {
                     exam1.setExamTitle(exam.getExamTitle());
                     exam1.setExamDescription(exam.getExamDescription());
-                    exam1.setSubject(subject.get());
+                    exam1.setSubject(subject.orElse(null));
                     exam1.setExamCategory(examCategory);
                     exam1.setTotalMark(exam.getTotalMark());
                     exam1.setExamEndDate(exam.getExamEndDate());
@@ -60,7 +62,7 @@ public class ExamService {
                     exam1.setIsNegativeAllowed(exam.getIsNegativeAllowed());
                     exam1.setIsPaid(exam.getIsPaid());
                     exam1.setUpdatedBy(exam.getUpdatedBy());
-                    return  mapper.convertValue(examRepository.save(exam1), ExamDto.class);
+                    return mapper.convertValue(examRepository.save(exam1), ExamDto.class);
                 }
         ).orElseThrow(
                 () -> new UnprocessableEntityException("Unable to update Exam" + exam.getExamTitle())
@@ -69,7 +71,8 @@ public class ExamService {
 
     public void delete(String examId) {
         Optional<Exam> exam = examRepository.findById(examId);
-        examRepository.delete(exam.get());
+        assert exam.orElse(null) != null;
+        examRepository.delete(exam.orElse(null));
     }
 
     public Iterable<ExamDto> getAll() {
@@ -82,7 +85,7 @@ public class ExamService {
     }
 
     public ExamDto getOne(String examId) {
-        Exam exam =  examRepository.findById(examId).orElseThrow(() -> new NotFoundException("Could not find Exam!"));
+        Exam exam = examRepository.findById(examId).orElseThrow(() -> new NotFoundException("Could not find Exam!"));
         return mapper.convertValue(exam, ExamDto.class);
     }
 }

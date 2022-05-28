@@ -4,7 +4,6 @@ import com.dynast.examportal.dto.SubjectDto;
 import com.dynast.examportal.exception.DataBaseException;
 import com.dynast.examportal.service.SubjectService;
 import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -13,10 +12,13 @@ import java.util.Optional;
 @Api(value = "Subject APIs", tags = {"Subject Controller"})
 @RequestMapping(value = "/api/v1/subject/")
 public class SubjectController {
-    @Autowired
-    private SubjectService subjectService;
+    private final SubjectService subjectService;
 
-    @ApiOperation(value = "This is used to get a subject", notes = "")
+    public SubjectController(SubjectService subjectService) {
+        this.subjectService = subjectService;
+    }
+
+    @ApiOperation(value = "This is used to get a subject")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully fetched"),
             @ApiResponse(code = 404, message = "Not found")
@@ -28,7 +30,7 @@ public class SubjectController {
     }
 
 
-    @ApiOperation(value = "This is used to create a subject", notes = "")
+    @ApiOperation(value = "This is used to create a subject")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created"),
             @ApiResponse(code = 422, message = "failed to create")
@@ -39,7 +41,7 @@ public class SubjectController {
         return subjectService.createNewSubject(subject);
     }
 
-    @ApiOperation(value = "This is used to update a subject", notes = "")
+    @ApiOperation(value = "This is used to update a subject")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created"),
             @ApiResponse(code = 422, message = "failed to create")
@@ -50,7 +52,7 @@ public class SubjectController {
         return subjectService.updateSubject(subject);
     }
 
-    @ApiOperation(value = "This is used to get all subject", notes = "")
+    @ApiOperation(value = "This is used to get all subject")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully fetched"),
             @ApiResponse(code = 404, message = "Not Found")
@@ -61,7 +63,7 @@ public class SubjectController {
         return subjectService.getAllSubject();
     }
 
-    @ApiOperation(value = "This is used to delete a subject", notes = "")
+    @ApiOperation(value = "This is used to delete a subject")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully deleted"),
             @ApiResponse(code = 422, message = "failed to delete")

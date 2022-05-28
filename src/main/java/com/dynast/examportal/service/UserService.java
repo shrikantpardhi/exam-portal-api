@@ -8,7 +8,6 @@ import com.dynast.examportal.repository.RoleRepository;
 import com.dynast.examportal.repository.UserRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,19 +19,22 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private com.dynast.examportal.util.User userUtil;
+    private final com.dynast.examportal.util.User userUtil;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public UserService(UserRepository userRepository, com.dynast.examportal.util.User userUtil, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userUtil = userUtil;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public void initRoleAndUser() {
 
@@ -90,7 +92,7 @@ public class UserService {
     }
 
     private UserDto getCreateUserDto(UserDto user) {
-        Role role = roleRepository.findById("User").get();
+        Role role = roleRepository.findById("User").orElse(null);
         User u = mapper.convertValue(user, User.class);
         Set<Role> userRoles = new HashSet<>();
         userRoles.add(role);

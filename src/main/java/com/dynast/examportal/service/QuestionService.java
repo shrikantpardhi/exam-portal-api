@@ -13,7 +13,6 @@ import com.dynast.examportal.repository.QuestionTypeRepository;
 import com.dynast.examportal.repository.SubjectRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,28 +22,31 @@ import java.util.Optional;
 @Service
 public class QuestionService {
 
-    @Autowired
-    private QuestionRepository questionRepository;
+    private final QuestionRepository questionRepository;
 
-    @Autowired
-    private SubjectRepository subjectRepository;
+    private final SubjectRepository subjectRepository;
 
-    @Autowired
-    private ExamRepository examRepository;
+    private final ExamRepository examRepository;
 
-    @Autowired
-    private QuestionTypeRepository questionTypeRepository;
+    private final QuestionTypeRepository questionTypeRepository;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public QuestionService(QuestionRepository questionRepository, SubjectRepository subjectRepository, ExamRepository examRepository, QuestionTypeRepository questionTypeRepository) {
+        this.questionRepository = questionRepository;
+        this.subjectRepository = subjectRepository;
+        this.examRepository = examRepository;
+        this.questionTypeRepository = questionTypeRepository;
+    }
 
     public QuestionDto create(QuestionDto question) {
         Optional<Subject> subject = subjectRepository.findById(question.getSubjectDto().getSubjectId());
         Optional<Exam> exam = examRepository.findById(question.getExamDto().getExamId());
         Optional<QuestionType> questionType = questionTypeRepository.findById(question.getQuestionTypeDto().getQuestionTypeId());
         Question que = mapper.convertValue(question, Question.class);
-        que.setSubject(subject.get());
-        que.setExam(exam.get());
-        que.setQuestionType(questionType.get());
+        que.setSubject(subject.orElse(null));
+        que.setExam(exam.orElse(null));
+        que.setQuestionType(questionType.orElse(null));
         return mapper.convertValue(questionRepository.save(que), QuestionDto.class);
     }
 
@@ -54,9 +56,9 @@ public class QuestionService {
         Optional<QuestionType> questionType = questionTypeRepository.findById(question.getQuestionTypeDto().getQuestionTypeId());
         return questionRepository.findById(question.getQuestionId()).map(
                 question1 -> {
-                    question1.setExam(exam.get());
-                    question1.setSubject(subject.get());
-                    question1.setQuestionType(questionType.get());
+                    question1.setExam(exam.orElse(null));
+                    question1.setSubject(subject.orElse(null));
+                    question1.setQuestionType(questionType.orElse(null));
                     question1.setQuestionTitle(question.getQuestionTitle());
                     question1.setQuestionDescription(question.getQuestionDescription());
                     question1.setQuestionAnswerDescription(question.getQuestionAnswerDescription());
@@ -79,7 +81,7 @@ public class QuestionService {
     }
 
     public QuestionDto findQuestionById(String questionId) {
-        Question question =  questionRepository.findById(questionId)
+        Question question = questionRepository.findById(questionId)
                 .orElseThrow(
                         () -> new NotFoundException("Could not find Question")
                 );

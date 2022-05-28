@@ -4,15 +4,17 @@ import com.dynast.examportal.dto.QuestionTypeDto;
 import com.dynast.examportal.exception.DataBaseException;
 import com.dynast.examportal.service.QuestionTypeService;
 import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Api(value = "Question Type APIs", tags = {"Question Type Controller"})
 @RequestMapping(value = "/api/v1/questiontype/")
 public class QuestionTypeController {
-    @Autowired
-    private QuestionTypeService questionTypeService;
+    private final QuestionTypeService questionTypeService;
+
+    public QuestionTypeController(QuestionTypeService questionTypeService) {
+        this.questionTypeService = questionTypeService;
+    }
 
     @ApiOperation(value = "This is used to get all Question Type")
     @ApiResponses(value = {

@@ -9,7 +9,6 @@ import com.dynast.examportal.repository.AnswerRepository;
 import com.dynast.examportal.repository.QuestionRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,13 +17,16 @@ import java.util.List;
 @Service
 public class AnswerService {
 
-    @Autowired
-    private AnswerRepository answerRepository;
+    private final AnswerRepository answerRepository;
 
-    @Autowired
-    private QuestionRepository questionRepository;
+    private final QuestionRepository questionRepository;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
+
+    public AnswerService(AnswerRepository answerRepository, QuestionRepository questionRepository) {
+        this.answerRepository = answerRepository;
+        this.questionRepository = questionRepository;
+    }
 
     public void delete(String answerId) {
         answerRepository.deleteById(answerId);
@@ -67,7 +69,7 @@ public class AnswerService {
     }
 
     public AnswerDto getByAnswerId(String answerId) {
-        Answer answer =  answerRepository.findById(answerId).orElseThrow(() -> new NotFoundException("Answer not found with Id " + answerId));
+        Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new NotFoundException("Answer not found with Id " + answerId));
         return mapper.convertValue(answer, AnswerDto.class);
     }
 }
