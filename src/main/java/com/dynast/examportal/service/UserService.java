@@ -9,6 +9,8 @@ import com.dynast.examportal.repository.RoleRepository;
 import com.dynast.examportal.repository.UserRepository;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.platform.commons.logging.Logger;
+import org.junit.platform.commons.logging.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ import java.util.Set;
 
 @Service
 public class UserService {
-
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
 
     private final com.dynast.examportal.util.User userUtil;
@@ -62,6 +64,7 @@ public class UserService {
     }
 
     public Iterable<UserDto> getAllUser() {
+        logger.info(() -> "Get list of users");
         Iterable<User> users = userRepository.findAll();
         List<UserDto> userDtos = new ArrayList<>();
         users.forEach(
@@ -79,6 +82,7 @@ public class UserService {
     }
 
     public UserDto updateUser(UserDto user) {
+        logger.info(() -> "Update user "+user.getEmail());
         return userRepository.findById(userUtil.getUsername()).map(u -> {
             u.setUserFirstName(user.getUserFirstName());
             u.setUserLastName(user.getUserLastName());
@@ -116,6 +120,6 @@ public class UserService {
     }
 
     public Boolean validateIfExist(String emailId, String mobile) {
-        return userRepository.findByEmailOrUserMobile(emailId,mobile).isPresent();
+        return userRepository.findByEmailOrUserMobile(emailId, mobile).isPresent();
     }
 }

@@ -13,11 +13,10 @@
 <!--            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>-->
 <!--        </encoder>-->
 <!--    </appender>-->
-    <property name="LOG_ROOT" value="/target" />
+
     <property name="LOG_FILE" value="examportal" />
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_FILE}.log</file>
-<!--        <file>${LOG_ROOT}/${LOG_FILE}.log</file>-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
             <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>
@@ -33,6 +32,5 @@
 
     <root level="info">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
     </root>
 </configuration>
