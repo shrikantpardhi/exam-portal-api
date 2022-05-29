@@ -72,4 +72,19 @@ public class SpringFoxConfig {
                 .paths(PathSelectors.any())
                 .build();
     }
+
+/*
+    @Bean
+    public GroupedOpenApi userOpenApi() {
+        String packagesToscan[] = {"test.org.springdoc.api.app68.api.user"};
+        return GroupedOpenApi.builder().setGroup("users").packagesToScan(packagesToscan)
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi storeOpenApi() {
+        String paths[] = {"/store/**"};
+        return GroupedOpenApi.builder().setGroup("stores").pathsToMatch(paths)
+                .build();
+    }*/
 }
