@@ -11,8 +11,6 @@ import io.swagger.annotations.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
-
 @RestController
 @Api(value = "All user profile related APIs", tags = {"User Controller"})
 @RequestMapping(value = "/api/v1/user/")
@@ -26,10 +24,10 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-    /*@PostConstruct
-    public void initRoleAndUser() {
-        userService.initRoleAndUser();
-    }*/
+//    @PostConstruct
+//    public void initRoleAndUser() {
+//        userService.initRoleAndUser();
+//    }
 
     @ApiOperation(value = "This is used to get all users")
     @ApiResponses(value = {

@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -26,8 +24,12 @@ public class UserResult extends AbstractTimestampEntity implements Serializable 
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String resultId;
-    private String userId;
-    private String examId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userName", referencedColumnName = "userName")
+    private User user;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "examId", referencedColumnName = "examId")
+    private Exam exam;
     private String obtainedMark;
     private String negativeMark;
     private Date startAt;
