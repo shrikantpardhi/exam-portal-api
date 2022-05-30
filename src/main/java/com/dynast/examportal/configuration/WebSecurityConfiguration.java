@@ -40,9 +40,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors();
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/api/v1/authenticate", "/api/v1/create", "/swagger**").permitAll()
+                .authorizeRequests()
+                .antMatchers("/api/v1/authenticate", "/api/v1/create").permitAll()
                 .antMatchers("/api/test/**").permitAll() // permit the class of test
-//                .antMatchers("/**").permitAll() // permit all the routers after swagger-ui.html
+                .antMatchers("/swagger**",  "/webjars/**", "/swagger-resources/**", "/v2/api**").permitAll() // permit all the routers after swagger-ui.html
+//                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
