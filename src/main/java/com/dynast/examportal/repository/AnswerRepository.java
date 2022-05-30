@@ -18,4 +18,9 @@ public interface AnswerRepository extends CrudRepository<Answer, String> {
     Iterable<Answer> findAllByQuestionId(@Param("questionId") String questionId);
 
     Iterable<Answer> findByQuestion(Question question);
+
+    Optional<Answer> findById(String answerId);
+
+//    @Query(value = "select a from answer where a.question_id = :questionId and a.is_correct = :status", nativeQuery = true)
+    Answer findByQuestionAndIsCorrect(Question question, Boolean status);
 }

@@ -1,5 +1,6 @@
 package com.dynast.examportal.controller;
 
+import com.dynast.examportal.dto.ResultPageDto;
 import com.dynast.examportal.dto.UserResultDto;
 import com.dynast.examportal.exception.DataBaseException;
 import com.dynast.examportal.service.UserResultService;
@@ -41,8 +42,8 @@ public class UserResultController extends ApplicationController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @GetMapping("{userName}/{resultId}")
-    public UserResultDto getOne(@ApiParam(name = "userName", required = true) @PathVariable String userName, @ApiParam(name = "resultId", required = true) @PathVariable String resultId) {
-        return userResultService.getResultByUser(userName, resultId);
+    public ResultPageDto getOne(@ApiParam(name = "userName", required = true) @PathVariable String userName, @ApiParam(name = "resultId", required = true) @PathVariable String resultId) {
+        return userResultService.getResultPageByUser(userName, resultId);
     }
 
     @ApiOperation(value = "This is used to create a User Result")

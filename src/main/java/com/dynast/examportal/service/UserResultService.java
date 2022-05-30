@@ -1,16 +1,10 @@
 package com.dynast.examportal.service;
 
-import com.dynast.examportal.dto.ExamDto;
-import com.dynast.examportal.dto.UserDto;
-import com.dynast.examportal.dto.UserResultDto;
+import com.dynast.examportal.dto.*;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
-import com.dynast.examportal.model.Exam;
-import com.dynast.examportal.model.User;
-import com.dynast.examportal.model.UserResult;
-import com.dynast.examportal.repository.ExamRepository;
-import com.dynast.examportal.repository.UserRepository;
-import com.dynast.examportal.repository.UserResultRepository;
+import com.dynast.examportal.model.*;
+import com.dynast.examportal.repository.*;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.dynast.examportal.util.ResultJsonData;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,9 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserResultService {
@@ -31,12 +23,18 @@ public class UserResultService {
 
     private final ExamRepository examRepository;
 
+    private final QuestionRepository questionRepository;
+
+    private final AnswerRepository answerRepository;
+
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
 
-    public UserResultService(UserResultRepository userResultRepository, UserRepository userRepository, ExamRepository examRepository) {
+    public UserResultService(UserResultRepository userResultRepository, UserRepository userRepository, ExamRepository examRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
         this.userResultRepository = userResultRepository;
         this.userRepository = userRepository;
         this.examRepository = examRepository;
+        this.questionRepository = questionRepository;
+        this.answerRepository = answerRepository;
     }
 
     public Iterable<UserResultDto> getAll() {
@@ -50,17 +48,6 @@ public class UserResultService {
         );
         Iterable<UserResult> userResults = userResultRepository.findByUser(user);
         return getUserResultDtoList(userResults);
-    }
-
-    public UserResultDto getResultByUser(String userName, String resultId) {
-        User user = userRepository.findByUserName(userName).orElseThrow(
-                () -> new NotFoundException("Could not find User")
-        );
-        UserResult userResult = userResultRepository.findByUserAndResultId(user, resultId)
-                .orElseThrow(
-                        () -> new NotFoundException("Could not find result!")
-                );
-        return toUserResultDto(userResult);
     }
 
     public UserResultDto create(UserResultDto userResult) {
@@ -87,15 +74,103 @@ public class UserResultService {
                 );
     }
 
+    public ResultPageDto getResultPageByUser(String userName, String resultId) {
+        ResultPageDto resultPageDto = new ResultPageDto();
+        List<ResultData> resultDataList = new ArrayList<>();
+        User user = userRepository.findByUserName(userName).orElseThrow(
+                () -> new NotFoundException("Could not find User")
+        );
+        UserResult userResult = userResultRepository.findByUserAndResultId(user, resultId)
+                .orElseThrow(
+                        () -> new NotFoundException("Could not find result!")
+                );
+
+        List<ResultJsonData> resultJsonDataList = getResultJsonDataList(userResult.getResultJsonData());
+        if (!resultJsonDataList.isEmpty()) {
+            resultJsonDataList.forEach(
+                    resultJsonData -> resultDataList.add(getResultDetails(resultJsonData))
+            );
+        }
+        resultPageDto.setResultDataList(resultDataList);
+        resultPageDto.setStartAt(userResult.getStartAt());
+        resultPageDto.setEndAt(userResult.getEndAt());
+        resultPageDto.setExam(userResult.getExam());
+        resultPageDto.setNegativeMark(userResult.getNegativeMark());
+        resultPageDto.setObtainedMark(userResult.getObtainedMark());
+        resultPageDto.setTotalMark(userResult.getExam().getTotalMark());
+        return resultPageDto;
+    }
+
+    private ResultData getResultDetails(ResultJsonData resultJsonData) {
+        ResultData resultData = new ResultData();
+        resultData.setSeqId(resultJsonData.getSeqId());
+        Question question = getQuestionById(resultJsonData.getQuestionId());
+        Answer submittedAnswer = answerRepository.findById(resultJsonData.getSubmittedAnswerId()).orElseThrow(
+                () -> new NotFoundException("Could not find Answer")
+        );
+        Answer correctAnswer = answerRepository.findByQuestionAndIsCorrect(question, true);
+        resultData.setQuestionTitle(question.getQuestionTitle());
+        resultData.setQuestionDescription(question.getQuestionDescription());
+        resultData.setQuestionImage(question.getQuestionImage());
+        resultData.setQuestionAnswerDescriptionImage(question.getQuestionAnswerDescriptionImage());
+        resultData.setIsNegativeAllowed(question.getIsNegativeAllowed());
+        resultData.setQuestionMark(question.getQuestionMark());
+        resultData.setCorrectAnswer(mapper.convertValue(correctAnswer, QuestionAnswer.class));
+        resultData.setSubmittedAnswer(mapper.convertValue(submittedAnswer, QuestionAnswer.class));
+        return resultData;
+    }
+
+
+    private Question getQuestionById(String questionId) {
+        return questionRepository.findById(questionId).orElseThrow(
+                () -> new NotFoundException("Could not find question")
+        );
+    }
+
     private void createResultData(UserResultDto userResult, Exam exam, User user, String resultJsonData, UserResult userResult1) {
+        float totalObtainMark = 0;
+        float negativeMark = 0;
+        Map<String, String> map = getTotalObtainedMark(userResult, negativeMark, totalObtainMark);
         userResult1.setUser(user);
         userResult1.setExam(exam);
         userResult1.setResultJsonData(resultJsonData);
         userResult1.setStartAt(userResult.getStartAt());
         userResult1.setEndAt(userResult.getEndAt());
-        userResult1.setNegativeMark(userResult.getNegativeMark());
-        userResult1.setObtainedMark(userResult.getObtainedMark());
+        userResult1.setNegativeMark(map.get("negativeMark"));
+        userResult1.setObtainedMark(map.get("obtainedMark"));
         userResult1.setTotalDuration(userResult.getTotalDuration());
+    }
+
+    private Map<String, String> getTotalObtainedMark(UserResultDto userResultDto, float negativeMark, float totalObtainMark) {
+        Map<String, String> map = new HashMap<>();
+        List<ResultJsonData> resultJsonDataList = userResultDto.getResultJsonDataList();
+        float finalTotalObtainMark = totalObtainMark;
+        resultJsonDataList.forEach(
+                resultJsonData -> {
+                    Question question = getQuestionById(resultJsonData.getQuestionId());
+                    Answer submittedAnswer = answerRepository.findById(resultJsonData.getSubmittedAnswerId()).orElseThrow(
+                            () -> new NotFoundException("Could not find Answer")
+                    );
+                    Answer correctAnswer = answerRepository.findByQuestionAndIsCorrect(question, true);
+                    if (submittedAnswer.getIsCorrect() == correctAnswer.getIsCorrect()) {
+                        updateObtainedMark(finalTotalObtainMark, question.getQuestionMark());
+                    } else if (question.getIsNegativeAllowed()) {
+                        updateNegativeMark(negativeMark, question.getQuestionMark());
+                    }
+                }
+        );
+        totalObtainMark -= negativeMark;
+        map.put("obtainedMark", Float.toString(totalObtainMark));
+        map.put("negativeMark", Float.toString(negativeMark));
+        return map;
+    }
+
+    private void updateNegativeMark(float negativeMark, int questionMark) {
+        negativeMark += (questionMark / 3);
+    }
+
+    private void updateObtainedMark(float totalObtainMark, int questionMark) {
+        totalObtainMark += questionMark;
     }
 
     private String getResultDataToJsonString(UserResultDto userResult) {
@@ -122,13 +197,7 @@ public class UserResultService {
 
     private UserResultDto toUserResultDto(UserResult userResult) {
         UserResultDto userResultDto = mapper.convertValue(userResult, UserResultDto.class);
-        List<ResultJsonData> resultJsonData = null;
-        try {
-            resultJsonData = mapper.readValue(userResult.getResultJsonData(), new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        List<ResultJsonData> resultJsonData = getResultJsonDataList(userResult.getResultJsonData());
         ExamDto examDto = mapper.convertValue(userResult.getExam(), ExamDto.class);
         UserDto userDto = mapper.convertValue(userResult.getUser(), UserDto.class);
         userResultDto.setUserDto(userDto);
@@ -138,11 +207,22 @@ public class UserResultService {
         return userResultDto;
     }
 
+    private List<ResultJsonData> getResultJsonDataList(String resultJsonData) {
+        List<ResultJsonData> resultJsonDataList = null;
+        try {
+            resultJsonDataList = mapper.readValue(resultJsonData, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return resultJsonDataList;
+    }
+
     private Iterable<UserResultDto> getUserResultDtoList(Iterable<UserResult> userResults) {
-        List<UserResultDto> userResultDtos = new ArrayList<>();
+        List<UserResultDto> userResultDtoList = new ArrayList<>();
         userResults.forEach(
-                userResult -> userResultDtos.add(toUserResultDto(userResult))
+                userResult -> userResultDtoList.add(toUserResultDto(userResult))
         );
-        return userResultDtos;
+        return userResultDtoList;
     }
 }
