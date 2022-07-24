@@ -1,5 +1,6 @@
 package com.dynast.examportal.service;
 
+import com.dynast.examportal.configuration.AuthService;
 import com.dynast.examportal.model.JwtRequest;
 import com.dynast.examportal.model.JwtResponse;
 import com.dynast.examportal.model.User;
@@ -16,8 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService implements UserDetailsService {
@@ -28,44 +28,37 @@ public class JwtService implements UserDetailsService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private AuthService authService;
+
+
     public JwtResponse createJwtToken(JwtRequest jwtRequest) throws Exception {
         String email = jwtRequest.getEmail();
-        User user2 = loadUserByEmail(email);
-        String userName = user2.getUserName();
+        User user = loadUserByEmail(email);
+        String userName = user.getUserName();
         String userPassword = jwtRequest.getUserPassword();
         authenticate(userName, userPassword);
-
-        UserDetails userDetails = loadUserByUsername(userName);
-        String newGeneratedToken = jwtUtil.generateToken(userDetails);
-
-        User user = userRepository.findById(userName).get();
+        String newGeneratedToken = jwtUtil.generateToken(userName);
         return new JwtResponse(user, newGeneratedToken);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findById(username).get();
-        if (user != null) {
-            return new org.springframework.security.core.userdetails.User(
-                    user.getUserName(),
-                    user.getUserPassword(),
-                    getAuthority(user)
-            );
-        } else {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
+        User user = userRepository.findById(username)
+                .orElseThrow(
+                        () -> new UsernameNotFoundException("User not found with username: " + username)
+                );
+        return new org.springframework.security.core.userdetails.User(
+                user.getUserName(),
+                user.getUserPassword(),
+                authService.getRoles(user).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
+        );
     }
 
     private User loadUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
 
-    }
-
-    private Set<SimpleGrantedAuthority> getAuthority(User user) {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        user.getRole().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName())));
-        return authorities;
     }
 
     private void authenticate(String userName, String userPassword) throws Exception {

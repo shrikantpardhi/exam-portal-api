@@ -1,5 +1,6 @@
 package com.dynast.examportal.util;
 
+import com.dynast.examportal.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -30,9 +31,9 @@ public class JwtUtil {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token, String uname) {
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(uname) && !isTokenExpired(token));
     }
 
     private Boolean isTokenExpired(String token) {
@@ -44,13 +45,13 @@ public class JwtUtil {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(String username) {
 
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
