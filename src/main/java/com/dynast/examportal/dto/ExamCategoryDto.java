@@ -18,5 +18,6 @@ public class ExamCategoryDto implements Serializable {
     //    @NotNull(message = "Exam Category is mandatory")
     private String examCategoryName;
     private String updatedBy;
+    private int examCount;
     private Boolean isPremium;
 }

@@ -26,6 +26,6 @@ public class ExamDto implements Serializable {
     private int examDuration;
     private Date examEndDate;
     private Boolean isPaid;
-
+    private int questionCount;
     private String updatedBy;
 }

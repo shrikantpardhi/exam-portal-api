@@ -8,6 +8,8 @@ import com.dynast.examportal.model.JwtResponse;
 import com.dynast.examportal.service.JwtService;
 import com.dynast.examportal.service.UserService;
 import io.swagger.annotations.*;
+import lombok.val;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,9 +45,9 @@ public class UserController {
     @ApiOperation(value = "This is used to get all subject")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully fetched"),
-            @ApiResponse(code = 422, message = "failed to craete")
+            @ApiResponse(code = 422, message = "failed to create")
     })
-    @PostMapping({"create"})
+    @PostMapping(value = {"create"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public JwtResponse registerNewUser(@ApiParam(name = "user", required = true) @RequestBody UserDto user) throws Exception {
         UserDto u = userService.registerNewUser(user);
         if (u != null) {
@@ -62,7 +64,7 @@ public class UserController {
             @ApiResponse(code = 200, message = "Successfully updated"),
             @ApiResponse(code = 422, message = "failed to updated")
     })
-    @PutMapping({"update"})
+    @PutMapping(value = {"update"})
     @PreAuthorize("hasRole('User')")
     public UserDto updateUser(@ApiParam(name = "user", required = true) @RequestBody UserDto user) throws DataBaseException {
         return userService.updateUser(user);
@@ -95,6 +97,7 @@ public class UserController {
             @ApiResponse(code = 200, message = "Successfully retrieved"),
             @ApiResponse(code = 404, message = "Not found - The user was not found")
     })
+
     @GetMapping({"/user/validate"})
     public Boolean validate(@ApiParam(name = "emailId", required = true) @RequestParam String emailId,
                             @ApiParam(name = "mobile", required = true) @RequestParam String mobile) {
