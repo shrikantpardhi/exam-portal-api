@@ -17,17 +17,17 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto implements Serializable {
     private String userName;
-    private String userFirstName;
-    private String userLastName;
-    private String userPassword;
+    private String firstName;
+    private String lastName;
+    private String password;
     private String email;
-    private String userMobile;
-    private String userAddress;
-    private String userImage;
-    private String userCity;
-    private String userState;
-    private String userEducation;
-    private String userStatus;
+    private String mobile;
+    private String address;
+    private String image;
+    private String city;
+    private String state;
+    private String education;
+    private String status;
     private String updatedBy;
     private Set<Role> role;
 }

@@ -6,9 +6,13 @@ import com.dynast.examportal.model.Subject;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
+
 @Repository
 public interface QuestionRepository extends CrudRepository<Question, String> {
-    Iterable<Question> findByExam(Exam exam);
+    Iterable<Question> findByExam(@NotNull Exam exam);
 
-    Iterable<Question> findBySubject(Subject subject);
+    Iterable<Question> findBySubject(@NotNull Subject subject);
+
+    int countByExam(@NotNull Exam exam);
 }

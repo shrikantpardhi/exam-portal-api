@@ -49,21 +49,22 @@ public class UserServiceImpl implements UserService {
 
         Role userRole = new Role();
         userRole.setRoleName("User");
-        userRole.setRoleDescription("Default role for newly created record");
+        userRole.setRoleDescription("User role");
         roleRepository.save(userRole);
 
-        User adminUser = new User();
-        adminUser.setUserName("admin123");
-        adminUser.setEmail("admin@gmail.com");
-        adminUser.setUserPassword(getEncodedPassword("admin@pass"));
-        adminUser.setUserFirstName("admin");
-        adminUser.setUserLastName("admin");
-        Set<Role> adminRoles = new HashSet<>();
-        adminRoles.add(adminRole);
-        adminUser.setRole(adminRoles);
-        userRepository.save(adminUser);
+//        User adminUser = new User();
+//        adminUser.setEmail("admin@gmail.com");
+//        adminUser.setPassword(getEncodedPassword("admin@pass"));
+//        adminUser.setFirstName("admin");
+//        adminUser.setLastName("admin");
+//        Set<Role> adminRoles = new HashSet<>();
+//        adminRoles.add(adminRole);
+//        adminUser.setRole(adminRoles);
+//        userRepository.save(adminUser);
+
     }
 
+    @Override
     public Iterable<UserDto> getAllUser() {
         logger.info(() -> "Get list of users");
         Iterable<User> users = userRepository.findAll();
@@ -74,31 +75,33 @@ public class UserServiceImpl implements UserService {
         return userDtos;
     }
 
+    @Override
     public UserDto registerNewUser(UserDto user) {
         return getCreateUserDto(user);
     }
 
-    public String getEncodedPassword(String password) {
+    private String getEncodedPassword(String password) {
         return passwordEncoder.encode(password);
     }
 
+    @Override
     public UserDto updateUser(UserDto user) {
-        logger.info(() -> "Update user "+user.getEmail());
+        logger.info(() -> "Update user {}"+user.getEmail());
         return userRepository.findById(userUtil.getUsername()).map(u -> {
-            u.setUserFirstName(user.getUserFirstName());
-            u.setUserLastName(user.getUserLastName());
+            u.setFirstName(user.getFirstName());
+            u.setLastName(user.getLastName());
             u.setEmail(user.getEmail());
-            u.setUserMobile(user.getUserMobile());
-            u.setUserEducation(user.getUserEducation());
-            u.setUserAddress(user.getUserAddress());
-            u.setUserCity(user.getUserCity());
-            u.setUserImage(user.getUserImage());
+            u.setMobile(user.getMobile());
+            u.setEducation(user.getEducation());
+            u.setAddress(user.getAddress());
+            u.setCity(user.getCity());
+            u.setImage(user.getImage());
             return mapper.convertValue(userRepository.save(u), UserDto.class);
         }).orElseGet(() -> getCreateUserDto(user));
     }
 
     private UserDto getCreateUserDto(UserDto user) {
-        Boolean status = validateIfExist(user.getEmail(), user.getUserMobile());
+        Boolean status = validateIfExist(user.getEmail(), user.getMobile());
         if (status)
             throw new UnprocessableEntityException("Email or Mobile is already present");
         Role role = roleRepository.findById("User").orElse(null);
@@ -106,21 +109,24 @@ public class UserServiceImpl implements UserService {
         Set<Role> userRoles = new HashSet<>();
         userRoles.add(role);
         user1.setRole(userRoles);
-        user1.setUserPassword(getEncodedPassword(user.getUserPassword()));
+        user1.setPassword(getEncodedPassword(user.getPassword()));
         return mapper.convertValue(userRepository.save(user1), UserDto.class);
     }
 
+    @Override
     public UserDto fetchUser(String emailId) {
         User user = userRepository.findByEmail(emailId).orElseThrow(() -> new NotFoundException(emailId));
         return mapper.convertValue(user, UserDto.class);
     }
 
+    @Override
     public UserDto getUserDetail(String userName) {
         User user = userRepository.findByUserName(userName).orElseThrow(() -> new NotFoundException(userName));
         return mapper.convertValue(user, UserDto.class);
     }
 
+    @Override
     public Boolean validateIfExist(String emailId, String mobile) {
-        return userRepository.findByEmailOrUserMobile(emailId, mobile).isPresent();
+        return userRepository.findByEmailOrMobile(emailId, mobile).isPresent();
     }
 }

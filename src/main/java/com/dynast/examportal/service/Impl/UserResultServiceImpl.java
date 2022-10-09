@@ -55,11 +55,13 @@ public class UserResultServiceImpl implements UserResultService {
         this.answerRepository = answerRepository;
     }
 
+    @Override
     public Iterable<UserResultDto> getAll() {
         Iterable<UserResult> userResults = userResultRepository.findAll();
         return getUserResultDtoList(userResults);
     }
 
+    @Override
     public Iterable<UserResultDto> getAllResultByUser(String userName) {
         User user = userRepository.findByUserName(userName).orElseThrow(
                 () -> new NotFoundException("Could not find User")
@@ -68,6 +70,7 @@ public class UserResultServiceImpl implements UserResultService {
         return getUserResultDtoList(userResults);
     }
 
+    @Override
     public UserResultDto create(UserResultDto userResult) {
         UserResult userResult1 = mapper.convertValue(userResult, UserResult.class);
         Exam exam = getExam(userResult);
@@ -77,6 +80,7 @@ public class UserResultServiceImpl implements UserResultService {
         return toUserResultDto(userResultRepository.save(userResult1));
     }
 
+    @Override
     public UserResultDto update(UserResultDto userResult) {
         Exam exam = getExam(userResult);
         User user = getUser(userResult);
@@ -92,6 +96,7 @@ public class UserResultServiceImpl implements UserResultService {
                 );
     }
 
+    @Override
     public ResultPageDto getResultPageByUser(String userName, String resultId) {
         ResultPageDto resultPageDto = new ResultPageDto();
         List<ResultData> resultDataList = new ArrayList<>();

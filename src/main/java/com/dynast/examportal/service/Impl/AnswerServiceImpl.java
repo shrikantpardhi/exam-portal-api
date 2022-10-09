@@ -30,10 +30,12 @@ public class AnswerServiceImpl implements AnswerService {
         this.questionRepository = questionRepository;
     }
 
+    @Override
     public void delete(String answerId) {
         answerRepository.deleteById(answerId);
     }
 
+    @Override
     public AnswerDto update(AnswerDto answer) {
         return answerRepository.findById(answer.getAnswerId()).map(ans -> {
             ans = createAnswer(answer);
@@ -43,11 +45,13 @@ public class AnswerServiceImpl implements AnswerService {
         );
     }
 
+    @Override
     public AnswerDto create(AnswerDto answer) {
         Answer ans = createAnswer(answer);
         return toAnswerDto(answerRepository.save(ans));
     }
 
+    @Override
     public Iterable<AnswerDto> getAllByQuestion(String questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow(
                 () -> new NotFoundException("Question Not found")
@@ -60,6 +64,7 @@ public class AnswerServiceImpl implements AnswerService {
         return answerDtoList;
     }
 
+    @Override
     public AnswerDto getByAnswerId(String answerId) {
         Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new NotFoundException("Answer not found"));
         return toAnswerDto(answer);

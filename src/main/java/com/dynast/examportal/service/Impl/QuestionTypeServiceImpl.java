@@ -24,6 +24,7 @@ public class QuestionTypeServiceImpl implements QuestionTypeService {
         this.questionTypeRepository = questionTypeRepository;
     }
 
+    @Override
     public Iterable<QuestionTypeDto> getAll() {
         Iterable<QuestionType> questionTypes = questionTypeRepository.findAll();
         List<QuestionTypeDto> questionTypeDtoList = new ArrayList<>();
@@ -33,6 +34,7 @@ public class QuestionTypeServiceImpl implements QuestionTypeService {
         return questionTypeDtoList;
     }
 
+    @Override
     public QuestionTypeDto update(QuestionTypeDto questionType) {
         QuestionType qType = questionTypeRepository.findById(questionType.getQuestionTypeId())
             .map(questionType1 -> {
@@ -46,12 +48,14 @@ public class QuestionTypeServiceImpl implements QuestionTypeService {
         return mapper.convertValue(qType, QuestionTypeDto.class);
     }
 
+    @Override
     public void deleteById(String questionTypeId) {
         Optional<QuestionType> questionType = Optional.ofNullable(questionTypeRepository.findById(questionTypeId)
                 .orElseThrow(() -> new NotFoundException("Could not find Exam Category!")));
         questionTypeRepository.delete(questionType.orElse(null));
     }
 
+    @Override
     public QuestionTypeDto getById(String questionTypeId) {
         QuestionType questionType = questionTypeRepository.findById(questionTypeId).orElseThrow(
                 () -> new NotFoundException("Could not find Question Type")
@@ -59,6 +63,7 @@ public class QuestionTypeServiceImpl implements QuestionTypeService {
         return mapper.convertValue(questionType, QuestionTypeDto.class);
     }
 
+    @Override
     public QuestionTypeDto create(QuestionTypeDto examCategory) {
         QuestionType qType = mapper.convertValue(examCategory, QuestionType.class);
         return mapper.convertValue(questionTypeRepository.save(qType), QuestionTypeDto.class);

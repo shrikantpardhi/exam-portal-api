@@ -20,5 +20,6 @@ public class SubjectDto implements Serializable {
     private String description;
     private String updatedBy;
     private Date created;
+    private long totalExams;
     private Date updated;
 }

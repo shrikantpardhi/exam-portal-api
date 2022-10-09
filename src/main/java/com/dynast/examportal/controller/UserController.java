@@ -7,11 +7,21 @@ import com.dynast.examportal.model.JwtRequest;
 import com.dynast.examportal.model.JwtResponse;
 import com.dynast.examportal.service.JwtService;
 import com.dynast.examportal.service.UserService;
-import io.swagger.annotations.*;
-import lombok.val;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(value = "All user profile related APIs", tags = {"User Controller"})
@@ -51,8 +61,8 @@ public class UserController {
     public JwtResponse registerNewUser(@ApiParam(name = "user", required = true) @RequestBody UserDto user) throws Exception {
         UserDto u = userService.registerNewUser(user);
         if (u != null) {
-            JwtRequest jwtRequest = new JwtRequest(user.getEmail(), user.getUserPassword());
-            return jwtService.createJwtToken(jwtRequest);
+            JwtRequest jwtRequest = new JwtRequest(user.getEmail(), user.getPassword());
+            return jwtService.getToken(jwtRequest);
         } else {
             throw new UnprocessableEntityException("Unable to create New User");
         }

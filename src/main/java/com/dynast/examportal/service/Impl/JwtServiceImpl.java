@@ -33,11 +33,11 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
     @Autowired
     private AuthService authService;
 
-
-    public JwtResponse createJwtToken(JwtRequest jwtRequest) throws Exception {
+    @Override
+    public JwtResponse getToken(JwtRequest jwtRequest) throws Exception {
         User user = loadUserByEmail(jwtRequest.getEmail());
         authenticate(user.getUserName(), jwtRequest.getPassword());
-        user.setUserPassword("");
+        user.setPassword("");
         return new JwtResponse(user, jwtUtil.generateToken(user.getUserName()));
     }
 
@@ -49,7 +49,7 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
                 );
         return new org.springframework.security.core.userdetails.User(
                 user.getUserName(),
-                user.getUserPassword(),
+                user.getPassword(),
                 authService.getRoles(user).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
         );
     }
@@ -72,7 +72,8 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
         }
     }
 
-    public ResponseEntity refersh(String token) {
+    @Override
+    public ResponseEntity refresh(String token) {
         String username = jwtUtil.getUsernameFromToken(token);
         if(jwtUtil.validateToken(token, username)){
             return ResponseEntity.ok(jwtUtil.generateToken(username));

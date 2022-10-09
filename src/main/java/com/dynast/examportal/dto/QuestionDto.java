@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,16 +20,12 @@ public class QuestionDto implements Serializable {
     private SubjectDto subjectDto;
     private QuestionTypeDto questionTypeDto;
     private String questionTitle;
-
     private String questionDescription;
-
     private String questionAnswerDescription;
     private Boolean isNegativeAllowed;
-
     private byte[] questionImage;
-
     private byte[] questionAnswerDescriptionImage;
     private int questionMark;
-
+    private List<AnswerDto> answers;
     private String updatedBy;
 }

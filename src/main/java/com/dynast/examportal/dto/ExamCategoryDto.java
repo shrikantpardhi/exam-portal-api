@@ -15,9 +15,8 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExamCategoryDto implements Serializable {
     private String examCategoryId;
-    //    @NotNull(message = "Exam Category is mandatory")
     private String examCategoryName;
     private String updatedBy;
-    private int examCount;
     private Boolean isPremium;
+    private long totalExams;
 }

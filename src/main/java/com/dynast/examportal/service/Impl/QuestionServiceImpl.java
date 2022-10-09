@@ -6,10 +6,12 @@ import com.dynast.examportal.dto.QuestionTypeDto;
 import com.dynast.examportal.dto.SubjectDto;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
+import com.dynast.examportal.model.Answer;
 import com.dynast.examportal.model.Exam;
 import com.dynast.examportal.model.Question;
 import com.dynast.examportal.model.QuestionType;
 import com.dynast.examportal.model.Subject;
+import com.dynast.examportal.repository.AnswerRepository;
 import com.dynast.examportal.repository.ExamRepository;
 import com.dynast.examportal.repository.QuestionRepository;
 import com.dynast.examportal.repository.QuestionTypeRepository;
@@ -33,15 +35,19 @@ public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionTypeRepository questionTypeRepository;
 
+    private final AnswerRepository answerRepository;
+
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, SubjectRepository subjectRepository, ExamRepository examRepository, QuestionTypeRepository questionTypeRepository) {
+    public QuestionServiceImpl(QuestionRepository questionRepository, SubjectRepository subjectRepository, ExamRepository examRepository, QuestionTypeRepository questionTypeRepository, AnswerRepository answerRepository) {
         this.questionRepository = questionRepository;
         this.subjectRepository = subjectRepository;
         this.examRepository = examRepository;
         this.questionTypeRepository = questionTypeRepository;
+        this.answerRepository = answerRepository;
     }
 
+    @Override
     public QuestionDto create(QuestionDto questionDto) {
         Subject subject = getSubject(questionDto);
         Exam exam = getExam(questionDto);
@@ -50,6 +56,7 @@ public class QuestionServiceImpl implements QuestionService {
         return toQuestionDto(questionRepository.save(question));
     }
 
+    @Override
     public QuestionDto update(QuestionDto questionDto) {
         Subject subject = getSubject(questionDto);
         Exam exam = getExam(questionDto);
@@ -62,6 +69,7 @@ public class QuestionServiceImpl implements QuestionService {
         ).orElseThrow(() -> new UnprocessableEntityException("Could not able to process request!"));
     }
 
+    @Override
     public void deleteById(String questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(
@@ -70,6 +78,7 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepository.delete(question);
     }
 
+    @Override
     public QuestionDto findQuestionById(String questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(
@@ -78,6 +87,7 @@ public class QuestionServiceImpl implements QuestionService {
         return toQuestionDto(question);
     }
 
+    @Override
     public Iterable<QuestionDto> getAllQuestion() {
         Iterable<Question> questions = questionRepository.findAll();
         List<QuestionDto> questionDtoList = new ArrayList<>();
@@ -87,6 +97,7 @@ public class QuestionServiceImpl implements QuestionService {
         return questionDtoList;
     }
 
+    @Override
     public Iterable<QuestionDto> findByExam(String examId) {
         Exam exam = examRepository.findById(examId).orElseThrow(
                 () -> new NotFoundException("Could not find exam!")
@@ -99,6 +110,7 @@ public class QuestionServiceImpl implements QuestionService {
         return questionDtoList;
     }
 
+    @Override
     public Iterable<QuestionDto> findBySubject(String subjectId) {
         Subject subject = subjectRepository.findById(subjectId).orElseThrow(
                 () -> new NotFoundException("Could not find subject!")
@@ -116,6 +128,8 @@ public class QuestionServiceImpl implements QuestionService {
         questionDto.setSubjectDto(mapper.convertValue(question.getSubject(), SubjectDto.class));
         questionDto.setQuestionTypeDto(mapper.convertValue(question.getQuestionType(), QuestionTypeDto.class));
         questionDto.setExamDto(mapper.convertValue(question.getExam(), ExamDto.class));
+        Iterable<Answer> answers = answerRepository.findByQuestion(question);
+        questionDto.setAnswers(mapper.convertValue(answers, List.class));
         return questionDto;
     }
 

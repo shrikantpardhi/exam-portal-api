@@ -15,4 +15,6 @@ public interface UserService  {
     UserDto getUserDetail(String userName);
 
     Boolean validateIfExist(String emailId, String mobile);
+
+    void initRoleAndUser();
 }
