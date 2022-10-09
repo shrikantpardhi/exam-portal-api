@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Api(value = "Question Type APIs", tags = {"Question Type Controller"})
-@RequestMapping(value = "/api/v1/questiontype/")
+@RequestMapping(value = "/api/v1/question-type/")
 public class QuestionTypeController {
     private final QuestionTypeService questionTypeService;
 

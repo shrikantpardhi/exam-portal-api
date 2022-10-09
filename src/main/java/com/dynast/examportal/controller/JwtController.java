@@ -24,8 +24,8 @@ public class JwtController {
         return jwtService.createJwtToken(jwtRequest);
     }
 
-    @PostMapping({"refersh"})
-    public ResponseEntity refershJwtToken(@RequestBody String token) throws Exception {
+    @PostMapping({"refresh"})
+    public ResponseEntity refreshJwtToken(@RequestBody String token) throws Exception {
         return jwtService.refersh(token);
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Api(value = "Exam Category APIs", tags = {"Exam Category Controller"})
-@RequestMapping(value = "/api/v1/examcategory/")
+@RequestMapping(value = "/api/v1/exam-category/")
 public class ExamCategoryController extends ApplicationController {
 
     private final ExamCategoryService examCategoryService;
