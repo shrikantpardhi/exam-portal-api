@@ -1,5 +1,6 @@
 package com.dynast.examportal.dto;
 
+import com.dynast.examportal.model.EducatorCode;
 import com.dynast.examportal.model.Role;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -16,7 +17,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto implements Serializable {
-    private String userName;
+    private String userId;
     private String firstName;
     private String lastName;
     private String password;
@@ -27,7 +28,7 @@ public class UserDto implements Serializable {
     private String city;
     private String state;
     private String education;
-    private String status;
-    private String updatedBy;
+    private Boolean status;
     private Set<Role> role;
+    private Set<EducatorCode> educatorCode;
 }
