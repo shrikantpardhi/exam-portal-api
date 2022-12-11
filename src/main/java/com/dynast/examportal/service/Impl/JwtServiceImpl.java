@@ -36,19 +36,19 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
     @Override
     public JwtResponse getToken(JwtRequest jwtRequest) throws Exception {
         User user = loadUserByEmail(jwtRequest.getEmail());
-        authenticate(user.getUserName(), jwtRequest.getPassword());
+        authenticate(user.getUserId(), jwtRequest.getPassword());
         user.setPassword("");
-        return new JwtResponse(user, jwtUtil.generateToken(user.getUserName()));
+        return new JwtResponse(user, jwtUtil.generateToken(user.getEmail()));
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findById(username)
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        User user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new UsernameNotFoundException("User not found with username: " + username)
+                        () -> new UsernameNotFoundException("User not found with username: " + userId)
                 );
         return new org.springframework.security.core.userdetails.User(
-                user.getUserName(),
+                String.valueOf(user.getUserId()),
                 user.getPassword(),
                 authService.getRoles(user).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
         );
@@ -60,9 +60,9 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
 
     }
 
-    private void authenticate(String userName, String userPassword) throws Exception {
+    private void authenticate(String userId, String userPassword) throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, userPassword));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userId, userPassword));
         } catch (DisabledException e) {
             System.out.println(e);
             throw new Exception("USER_DISABLED", e);
@@ -74,9 +74,9 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
 
     @Override
     public ResponseEntity refresh(String token) {
-        String username = jwtUtil.getUsernameFromToken(token);
-        if(jwtUtil.validateToken(token, username)){
-            return ResponseEntity.ok(jwtUtil.generateToken(username));
+        String userId = jwtUtil.getEmailFromToken(token);
+        if(jwtUtil.validateToken(token, userId)){
+            return ResponseEntity.ok(jwtUtil.generateToken(userId));
         }
         return null;
     }

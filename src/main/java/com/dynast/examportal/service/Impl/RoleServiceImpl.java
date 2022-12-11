@@ -1,24 +1,34 @@
 package com.dynast.examportal.service.Impl;
 
 import com.dynast.examportal.model.Role;
-import com.dynast.examportal.repository.RoleRepository;
 import com.dynast.examportal.service.RoleService;
-import org.springframework.stereotype.Service;
+import com.dynast.examportal.util.Roles;
+import org.springframework.stereotype.Component;
 
-@Service
+import java.util.HashSet;
+import java.util.Set;
+
+@Component
 public class RoleServiceImpl implements RoleService {
-
-    private final RoleRepository roleRepository;
-
-    public RoleServiceImpl(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
+    @Override
+    public Set<Role> getUserRole() {
+        HashSet<Role> roles = new HashSet<>();
+        roles.add(new Role(Roles.USER.getLabel(), Roles.USER.getDescription()));
+        return roles;
     }
 
-    public Role createNewRole(Role role) {
-        return roleRepository.save(role);
+    @Override
+    public Set<Role> getEducatorRole() {
+        HashSet<Role> roles = new HashSet<>();
+        roles.add(new Role(Roles.EDUCATOR.getLabel(), Roles.EDUCATOR.getDescription()));
+        return roles;
     }
 
-    public Iterable<Role> getAll() {
-        return roleRepository.findAll();
+    @Override
+    public Set<Role> getEducatorAndUserRole() {
+        HashSet<Role> roles = new HashSet<>();
+        roles.add(new Role(Roles.USER.getLabel(), Roles.USER.getDescription()));
+        roles.add(new Role(Roles.EDUCATOR.getLabel(), Roles.EDUCATOR.getDescription()));
+        return roles;
     }
 }

@@ -12,7 +12,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -20,17 +19,17 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity(name = "question_type")
-public class QuestionType implements Serializable {
+public class QuestionType {
 
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String questionTypeId;
 
-    @NotNull(message = "Question Type Name is Mandatory")
+    @NotNull(message = "Name is Mandatory")
     private String questionTypeName;
 
-    @NotNull
+    @NotNull(message = "Code is Mandatory")
     @Column(length = 5)
     private String questionTypeCode;
 }

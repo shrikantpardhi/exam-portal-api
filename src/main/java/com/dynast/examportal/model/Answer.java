@@ -8,7 +8,15 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -25,7 +33,7 @@ public class Answer {
     private String answerId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "questionId", referencedColumnName = "questionId")
+    @JoinColumn(name = "questionId", referencedColumnName = "questionId", foreignKey = @ForeignKey(name="FK_ANSWER_QUESTION"))
     private Question question;
 
     @Type(type = "text")

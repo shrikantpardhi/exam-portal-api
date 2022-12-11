@@ -9,37 +9,42 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "question")
 public class Question extends AbstractTimestampEntity implements Serializable {
 
-    //    @NotBlank(message = "Name is mandatory")
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
-//    @Column(name="QUE_ID")
     private String questionId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "questionExamId", referencedColumnName = "examId")
+    @JoinColumn(name = "examId", referencedColumnName = "examId", foreignKey = @ForeignKey(name="FK_QUESTION_EXAM"))
     private Exam exam;
 
-    @NotNull(message = "Subject is Mandatory")
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "subjectId", referencedColumnName = "subjectId")
-    private Subject subject;
-
-    @NotNull(message = "Question Type is Mandatory")
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "questionTypeId", referencedColumnName = "questionTypeId")
+    @JoinColumn(name = "tagId", referencedColumnName = "tagId", foreignKey = @ForeignKey(name="FK_QUESTION_TAG"))
+    private Tag tagId;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "questionTypeId", referencedColumnName = "questionTypeId", foreignKey = @ForeignKey(name="FK_QUESTION_TYPE"))
     private QuestionType questionType;
 
     @Type(type = "text")
@@ -60,12 +65,8 @@ public class Question extends AbstractTimestampEntity implements Serializable {
 
     @Lob
     @Column(name = "answer_desc_image", columnDefinition = "BLOB")
-    private byte[] questionAnswerDescriptionImage;
+    private byte[] answerDescriptionImage;
 
     @Column(name = "question_mark", length = 2)
     private int questionMark;
-
-    @Column(name = "updated_by", nullable = true)
-    private String updatedBy;
-
 }

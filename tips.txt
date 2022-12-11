@@ -1,0 +1,7 @@
+docker build -t /app .   # -t specify name
+docker run -p 8080:8080 /app
+
+#mysql instance
+docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw MYSQL_DATABASE=database-name -d mysql:tag
+
+

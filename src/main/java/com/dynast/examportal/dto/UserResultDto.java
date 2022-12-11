@@ -25,5 +25,8 @@ public class UserResultDto implements Serializable {
     private Date startAt;
     private Date EndAt;
     private String totalDuration;
+    private int answeredQuestion;
+    private int correctAnswer;
+    private int inCorrectAnswer;
     private List<ResultJsonData> resultJsonDataList;
 }

@@ -16,23 +16,6 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class SpringFoxConfig {
-//    @Bean
-//    public Docket api() {
-//        return new Docket(DocumentationType.SWAGGER_2)
-//          .select()
-//          .apis(RequestHandlerSelectors.basePackage("com.dynast.examportal.controller"))
-//          .paths(PathSelectors.any())
-//          .build();
-
-//    @Bean
-//    public Docket api() {
-//        return new Docket(DocumentationType.SWAGGER_2)
-//                .select()
-//                .apis(RequestHandlerSelectors.any())
-//                .paths(PathSelectors.any())
-//                .build();
-//    }
-
     private ApiKey apiKey() {
         return new ApiKey("JWT", "Authorization", "header");
     }
@@ -72,18 +55,4 @@ public class SpringFoxConfig {
                 .build();
     }
 
-/*
-    @Bean
-    public GroupedOpenApi userOpenApi() {
-        String packagesToscan[] = {"test.org.springdoc.api.app68.api.user"};
-        return GroupedOpenApi.builder().setGroup("users").packagesToScan(packagesToscan)
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi storeOpenApi() {
-        String paths[] = {"/store/**"};
-        return GroupedOpenApi.builder().setGroup("stores").pathsToMatch(paths)
-                .build();
-    }*/
 }

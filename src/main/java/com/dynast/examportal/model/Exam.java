@@ -8,9 +8,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,22 +33,25 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String examId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @JoinColumn(name = "subjectId", referencedColumnName = "subjectId")
-    private Subject subject;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @JoinColumn(name = "examCategoryId", referencedColumnName = "examCategoryId")
-    private ExamCategory examCategory;
+    @ManyToMany(cascade= CascadeType.ALL)
+    @JoinColumn(name = "tagId", referencedColumnName = "tagId", foreignKey = @ForeignKey(name="FK_EXAM_TAG"))
+    private List<Tag> tags;
 
     private String examTitle;
     private String examDescription;
     private Boolean isNegativeAllowed;
     private int totalMark;
     private int examDuration;
+    private Date examStartDate;
     private Date examEndDate;
     private Boolean isPaid;
-    private String updatedBy;
+
+    @ManyToOne(cascade= CascadeType.ALL)
+    @JoinColumn(name = "codeId", referencedColumnName = "codeId", foreignKey = @ForeignKey(name="FK_EXAM_EDUCATOR_CODE"))
+    private EducatorCode educatorCode;
+
+//    allow educator or admin to create exam
+    @OneToOne(cascade= CascadeType.ALL)
+    @JoinColumn(name="userId", referencedColumnName = "userId", foreignKey = @ForeignKey(name="FK_EXAM_USER"))
+    private User user;
 }

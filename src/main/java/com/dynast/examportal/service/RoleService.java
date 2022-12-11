@@ -2,8 +2,10 @@ package com.dynast.examportal.service;
 
 import com.dynast.examportal.model.Role;
 
-public interface RoleService {
-    Role createNewRole(Role role);
+import java.util.Set;
 
-    Iterable<Role> getAll();
+public interface RoleService {
+    Set<Role> getUserRole();
+    Set<Role> getEducatorRole();
+    Set<Role> getEducatorAndUserRole();
 }

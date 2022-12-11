@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+    app:
+        image: 'docker-spring-boot-postgres:latest'
+    build:
+        context: .
+    container_name: app
+    environment:
+        - SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/examportal
+        - SPRING_DATASOURCE_USERNAME=forjava
+        - SPRING_DATASOURCE_PASSWORD=forjava
+        - SPRING_JPA_HIBERNATE_DDL_AUTO=create

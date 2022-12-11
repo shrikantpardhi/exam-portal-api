@@ -16,16 +16,16 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExamDto implements Serializable {
     private String examId;
-
-    private SubjectDto subjectDto;
-    private ExamCategoryDto examCategoryDto;
+    private TagDto tagDto;
     private String examTitle;
     private String examDescription;
     private Boolean isNegativeAllowed;
     private int totalMark;
     private int examDuration;
+    private Date examStartDate;
     private Date examEndDate;
     private Boolean isPaid;
-    private String updatedBy;
+    private String educatorCode;
     private int totalQuestions;
+    private UserDto userDto;
 }

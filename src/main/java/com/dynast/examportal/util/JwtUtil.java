@@ -1,10 +1,8 @@
 package com.dynast.examportal.util;
 
-import com.dynast.examportal.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -18,7 +16,7 @@ public class JwtUtil {
     private static final String SECRET_KEY = "dyherd";
     private static final int TOKEN_VALIDITY = 3600 * 5;
 
-    public String getUsernameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
@@ -32,7 +30,7 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, String uname) {
-        final String username = getUsernameFromToken(token);
+        final String username = getEmailFromToken(token);
         return (username.equals(uname) && !isTokenExpired(token));
     }
 
@@ -45,13 +43,13 @@ public class JwtUtil {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String email) {
 
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)

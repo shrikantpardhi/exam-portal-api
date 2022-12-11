@@ -22,9 +22,8 @@ public class ExamController extends ApplicationController {
             @ApiResponse(code = 422, message = "Unable to process request")
     })
     @PostMapping("create")
-//    @PreAuthorize("hasRole('Admin')")
     public ExamDto createExam(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
-        exam.setUpdatedBy(getUser());
+        exam.setUserDto(getUserDto());
         return examService.create(exam);
     }
 
@@ -34,9 +33,8 @@ public class ExamController extends ApplicationController {
             @ApiResponse(code = 422, message = "Unable to process request")
     })
     @PutMapping("update")
-//    @PreAuthorize("hasRole('Admin')")
     public ExamDto updateExam(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
-        exam.setUpdatedBy(getUser());
+        exam.setUserDto(getUserDto());
         return examService.update(exam);
     }
 
@@ -46,7 +44,6 @@ public class ExamController extends ApplicationController {
             @ApiResponse(code = 422, message = "Unable to delete")
     })
     @DeleteMapping("{examId}")
-//    @PreAuthorize("hasRole('Admin')")
     public void deleteExam(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
         examService.delete(examId);
     }

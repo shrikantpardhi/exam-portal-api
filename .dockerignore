@@ -1,0 +1,10 @@
+target
+.git
+.idea
+bin
+.gitignore
+Dockerfile
+*.log
+mvn*
+*.txt
+*.yml

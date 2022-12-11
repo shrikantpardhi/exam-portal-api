@@ -3,7 +3,7 @@ package com.dynast.examportal.controller;
 import com.dynast.examportal.dto.ResultPageDto;
 import com.dynast.examportal.dto.UserResultDto;
 import com.dynast.examportal.exception.DataBaseException;
-import com.dynast.examportal.service.UserResultService;
+import com.dynast.examportal.service.ResultService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserResultController extends ApplicationController {
 
     @Autowired
-    private UserResultService userResultService;
+    private ResultService resultService;
 
     @ApiOperation(value = "This is used to get all results")
     @ApiResponses(value = {
@@ -23,7 +23,7 @@ public class UserResultController extends ApplicationController {
     })
     @GetMapping("all")
     public Iterable<UserResultDto> all() {
-        return userResultService.getAll();
+        return resultService.getAll();
     }
 
     @ApiOperation(value = "This is used to get all result by user")
@@ -32,8 +32,8 @@ public class UserResultController extends ApplicationController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @GetMapping("{userName}")
-    public Iterable<UserResultDto> getAllResultByUser(@ApiParam(name = "userName", required = true) @PathVariable String userName) {
-        return userResultService.getAllResultByUser(userName);
+    public Iterable<UserResultDto> getAllResultByUser(@ApiParam(name = "userId", required = true) @PathVariable String userId) {
+        return resultService.getAllResultByUser(userId);
     }
 
     @ApiOperation(value = "This is used to get Result by user")
@@ -42,8 +42,8 @@ public class UserResultController extends ApplicationController {
             @ApiResponse(code = 404, message = "Not found")
     })
     @GetMapping("{userName}/{resultId}")
-    public ResultPageDto getOne(@ApiParam(name = "userName", required = true) @PathVariable String userName, @ApiParam(name = "resultId", required = true) @PathVariable String resultId) {
-        return userResultService.getResultPageByUser(userName, resultId);
+    public ResultPageDto getOne(@ApiParam(name = "userId", required = true) @PathVariable String userId, @ApiParam(name = "resultId", required = true) @PathVariable String resultId) {
+        return resultService.getResultPageByUser(userId, resultId);
     }
 
     @ApiOperation(value = "This is used to create a User Result")
@@ -53,7 +53,7 @@ public class UserResultController extends ApplicationController {
     })
     @PostMapping("create")
     public UserResultDto create(@ApiParam(name = "userResult", required = true) @RequestBody UserResultDto userResult) {
-        return userResultService.create(userResult);
+        return resultService.create(userResult);
     }
 
     @ApiOperation(value = "This is used to update a User Result")
@@ -63,7 +63,7 @@ public class UserResultController extends ApplicationController {
     })
     @PutMapping("update")
     public UserResultDto update(@ApiParam(name = "userResult", required = true) @RequestBody UserResultDto userResult) throws DataBaseException {
-        return userResultService.update(userResult);
+        return resultService.update(userResult);
     }
 
 }

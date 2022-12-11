@@ -12,8 +12,7 @@ public interface QuestionService {
     QuestionDto findQuestionById(String questionId);
 
     Iterable<QuestionDto> findByExam(String examId);
-
-    Iterable<QuestionDto> findBySubject(String subjectId);
+    Iterable<QuestionDto> findByTag(String examId);
 
     Iterable<QuestionDto> getAllQuestion();
 }

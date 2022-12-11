@@ -1,5 +1,6 @@
 package com.dynast.examportal.configuration;
 
+import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.repository.UserRepository;
 import com.dynast.examportal.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,7 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -44,14 +44,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         final String requestTokenHeader = request.getHeader("Authorization");
 
-        String username = null;
+        String email = null;
         String jwtToken = null;
 
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
-                username = jwtUtil.getUsernameFromToken(jwtToken);
-                user.setUsername(username);
+                email = jwtUtil.getEmailFromToken(jwtToken);
+                user.setEmail(email);
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
@@ -60,20 +60,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            setSecurityContext(new WebAuthenticationDetailsSource().buildDetails(request), jwtToken, username);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            setSecurityContext(new WebAuthenticationDetailsSource().buildDetails(request), jwtToken, email);
         }
         filterChain.doFilter(request, response);
 
     }
 
-    private void setSecurityContext(WebAuthenticationDetails buildDetails, String jwtToken, String username) {
-        if (jwtUtil.validateToken(jwtToken, username)) {
+    private void setSecurityContext(WebAuthenticationDetails buildDetails, String jwtToken, String email) {
+        if (jwtUtil.validateToken(jwtToken, email)) {
             com.dynast.examportal.model.User user = userRepository
-                    .findByUserName(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
+                    .findByEmail(email)
+                    .orElseThrow(() -> new NotFoundException("User not found." + email));
             List<String> roles = authService.getRoles(user);
-            final UserDetails userDetails = new User(username, "", roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+            final UserDetails userDetails = new User(email, "", roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             usernamePasswordAuthenticationToken.setDetails(buildDetails);

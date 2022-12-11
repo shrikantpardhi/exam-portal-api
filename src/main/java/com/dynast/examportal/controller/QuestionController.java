@@ -24,7 +24,6 @@ public class QuestionController extends ApplicationController {
     })
     @PostMapping("create")
     public QuestionDto addQuestion(@ApiParam(name = "question", required = true) @RequestBody QuestionDto question) {
-        question.setUpdatedBy(getUser());
         return questionService.create(question);
     }
 
@@ -35,7 +34,6 @@ public class QuestionController extends ApplicationController {
     })
     @PutMapping("update")
     public QuestionDto UpdateQuestion(@ApiParam(name = "question", required = true) @RequestBody QuestionDto question) throws DataBaseException {
-        question.setUpdatedBy(getUser());
         return questionService.update(question);
     }
 
@@ -67,16 +65,6 @@ public class QuestionController extends ApplicationController {
     @GetMapping("exam/{examId}")
     public Iterable<QuestionDto> getByExamCategoryId(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
         return questionService.findByExam(examId);
-    }
-
-    @ApiOperation(value = "This is used to get question by subject")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully fetched"),
-            @ApiResponse(code = 404, message = "No data found")
-    })
-    @GetMapping("subject/{subjectId}")
-    public Iterable<QuestionDto> getBySubjectId(@ApiParam(name = "subjectId", required = true) @PathVariable String subjectId) {
-        return questionService.findBySubject(subjectId);
     }
 
     @ApiOperation(value = "This is used to get all questions")

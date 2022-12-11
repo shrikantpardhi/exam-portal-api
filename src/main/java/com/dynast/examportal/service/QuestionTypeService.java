@@ -3,7 +3,6 @@ package com.dynast.examportal.service;
 import com.dynast.examportal.dto.QuestionTypeDto;
 
 public interface QuestionTypeService {
-    void deleteById(String questionTypeId);
 
     QuestionTypeDto update(QuestionTypeDto questionType);
 
@@ -12,4 +11,6 @@ public interface QuestionTypeService {
     QuestionTypeDto getById(String questionTypeId);
 
     Iterable<QuestionTypeDto> getAll();
+
+    void deleteById(String questionTypeId);
 }

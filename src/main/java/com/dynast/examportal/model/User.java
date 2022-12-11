@@ -8,8 +8,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import java.util.Set;
 
 @Data
@@ -18,14 +27,14 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity(name = "user")
-public class User extends AbstractTimestampEntity implements Serializable {
+public class User extends AbstractTimestampEntity {
 
-    //	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
     @Id
+    /*don't user this because it uses hibernate sequence, it is common for all*/
+//	@GeneratedValue(strategy = GenerationType.AUTO)
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    private String userName;
+    private String userId;
     private String firstName;
     private String lastName;
     private String password;
@@ -40,8 +49,7 @@ public class User extends AbstractTimestampEntity implements Serializable {
     private String city;
     private String state;
     private String education;
-    private String status;
-    private String updatedBy;
+    private Boolean status;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "USER_ROLE",
@@ -50,7 +58,18 @@ public class User extends AbstractTimestampEntity implements Serializable {
             },
             inverseJoinColumns = {
                     @JoinColumn(name = "ROLE_ID")
-            }
+            }, foreignKey = @ForeignKey(name = "FK_USER_ROLE")
     )
     private Set<Role> role;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "USER_EDUCATOR_CODE",
+            joinColumns = {
+                    @JoinColumn(name = "USER_ID")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "CODE_ID")
+            }, foreignKey = @ForeignKey(name = "FK_USER_EDUCATOR")
+    )
+    private Set<EducatorCode> educatorCode;
 }

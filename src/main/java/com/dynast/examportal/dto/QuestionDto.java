@@ -17,15 +17,14 @@ import java.util.List;
 public class QuestionDto implements Serializable {
     private String questionId;
     private ExamDto examDto;
-    private SubjectDto subjectDto;
+    private TagDto tagDto;
     private QuestionTypeDto questionTypeDto;
     private String questionTitle;
     private String questionDescription;
     private String questionAnswerDescription;
     private Boolean isNegativeAllowed;
     private byte[] questionImage;
-    private byte[] questionAnswerDescriptionImage;
+    private byte[] answerDescriptionImage;
     private int questionMark;
     private List<AnswerDto> answers;
-    private String updatedBy;
 }
