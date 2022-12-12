@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +21,7 @@ import javax.persistence.Id;
 @Entity(name = "tag")
 /*
 * This model is used to store Exam Category and Subject name*/
-public class Tag {
+public class Tag  implements Serializable {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")

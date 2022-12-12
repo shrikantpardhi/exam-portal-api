@@ -1,6 +1,7 @@
 package com.dynast.examportal.service.Impl;
 
 import com.dynast.examportal.dto.UserDto;
+import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.model.Role;
 import com.dynast.examportal.model.User;
 import com.dynast.examportal.repository.RoleRepository;
@@ -9,8 +10,8 @@ import com.dynast.examportal.service.UserService;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.dynast.examportal.util.Roles;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,9 @@ import java.util.logging.Logger;
 @Service
 public class UserServiceImpl extends RoleServiceImpl implements UserService {
     private static final Logger LOGGER = Logger.getLogger(UserServiceImpl.class.getName());
+    @Autowired
     private final UserRepository userRepository;
-
+    @Autowired
     private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -41,7 +43,6 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
         Role adminRole = new Role();
         adminRole.setRoleName(Roles.ADMIN.getLabel());
         adminRole.setRoleDescription(Roles.ADMIN.getDescription());
-//        roleRepository.save(adminRole);
         Set<Role> role = new HashSet<>();
         role.add(adminRole);
         User user = new User();
@@ -51,7 +52,9 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
         user.setMobile("8975307295");
         user.setPassword(getEncodedPassword("password"));
         user.setRole(role);
-        userRepository.save(user);
+        if (!userRepository.findByEmail(user.getEmail()).isPresent()) {
+            userRepository.save(user);
+        }
     }
 
 
@@ -113,7 +116,7 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
     @Override
     public Boolean updatePassword(UserDto userDto) {
         LOGGER.info("inside updatePassword: " + userDto.getEmail());
-        User user = userRepository.findById(userDto.getUserId()).orElseThrow(() -> new UsernameNotFoundException("No user found"));
+        User user = userRepository.findById(userDto.getUserId()).orElseThrow(() -> new NotFoundException("No user found"));
         if (user.getPassword().equals(getEncodedPassword(userDto.getPassword()))) {
             user.setPassword(getEncodedPassword(userDto.getPassword()));
             userRepository.save(user);
@@ -127,7 +130,7 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
     @Override
     public Boolean resetPassword(String emailId) {
         LOGGER.info("inside resetPassword: " + emailId);
-        User user = userRepository.findByEmail(emailId).orElseThrow(() -> new UsernameNotFoundException("No user found"));
+        User user = userRepository.findByEmail(emailId).orElseThrow(() -> new NotFoundException("No user found"));
         /*
         * send an email to reset password*/
         return true;
@@ -136,15 +139,19 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
     @Override
     public UserDto getUserByEmailId(String emailId) {
         LOGGER.info("inside getUserByEmailId: " + emailId);
-        User user = userRepository.findByEmail(emailId).orElseThrow(() -> new UsernameNotFoundException("No user found"));
+        User user = userRepository.findByEmail(emailId).orElseThrow(() -> new NotFoundException("No user found"));
         return mapper.convertValue(user, UserDto.class);
     }
 
     @Override
     public UserDto getUserById(String userId) {
         LOGGER.info("inside getUserById: " + userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("No user found"));
-        return mapper.convertValue(user, UserDto.class);
+        User user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new NotFoundException("User not found with username: " + userId)
+                );
+        UserDto userDto = mapper.convertValue(user, UserDto.class);
+        return userDto;
     }
 
     @Override
@@ -153,7 +160,7 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
         User user = userRepository.findById(userId).map(user1 -> {
             user1.setStatus(!user1.getStatus());
             return userRepository.save(user1);
-        }).orElseThrow(() -> new UsernameNotFoundException("No user found."));
+        }).orElseThrow(() -> new NotFoundException("No user found."));
         return !user.getStatus();
     }
 

@@ -19,7 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -35,7 +35,7 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
 
     @ManyToMany(cascade= CascadeType.ALL)
     @JoinColumn(name = "tagId", referencedColumnName = "tagId", foreignKey = @ForeignKey(name="FK_EXAM_TAG"))
-    private List<Tag> tags;
+    private Set<Tag> tags;
 
     private String examTitle;
     private String examDescription;
@@ -51,7 +51,8 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     private EducatorCode educatorCode;
 
 //    allow educator or admin to create exam
-    @OneToOne(cascade= CascadeType.ALL)
+    @OneToOne(cascade= CascadeType.MERGE)
     @JoinColumn(name="userId", referencedColumnName = "userId", foreignKey = @ForeignKey(name="FK_EXAM_USER"))
     private User user;
+    private Boolean status = true;
 }

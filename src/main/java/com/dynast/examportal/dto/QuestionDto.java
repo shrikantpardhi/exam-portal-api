@@ -1,5 +1,6 @@
 package com.dynast.examportal.dto;
 
+import com.dynast.examportal.model.Tag;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.List;
 public class QuestionDto implements Serializable {
     private String questionId;
     private ExamDto examDto;
-    private TagDto tagDto;
+    private Tag tag;
     private QuestionTypeDto questionTypeDto;
     private String questionTitle;
     private String questionDescription;

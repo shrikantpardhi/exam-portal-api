@@ -10,6 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -19,6 +20,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import java.io.Serializable;
 import java.util.Set;
 
 @Data
@@ -27,7 +29,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity(name = "user")
-public class User extends AbstractTimestampEntity {
+public class User extends AbstractTimestampEntity implements Serializable {
 
     @Id
     /*don't user this because it uses hibernate sequence, it is common for all*/
@@ -49,7 +51,7 @@ public class User extends AbstractTimestampEntity {
     private String city;
     private String state;
     private String education;
-    private Boolean status;
+    private Boolean status = true;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "USER_ROLE",
@@ -62,14 +64,15 @@ public class User extends AbstractTimestampEntity {
     )
     private Set<Role> role;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+//    @NotFound(action = NotFoundAction.IGNORE)
     @JoinTable(name = "USER_EDUCATOR_CODE",
             joinColumns = {
                     @JoinColumn(name = "USER_ID")
             },
             inverseJoinColumns = {
                     @JoinColumn(name = "CODE_ID")
-            }, foreignKey = @ForeignKey(name = "FK_USER_EDUCATOR")
+            }, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
     )
     private Set<EducatorCode> educatorCode;
 }

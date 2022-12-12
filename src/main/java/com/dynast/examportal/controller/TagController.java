@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @Api(value = "Tag related APIs", tags = {"Tag Controller"})
@@ -36,7 +36,7 @@ public class TagController {
     }
 
     @GetMapping(value = {"search/{name}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    List<Tag> search(@ApiParam(name = "name", required = true) @PathVariable String name) {
+    Set<Tag> search(@ApiParam(name = "name", required = true) @PathVariable String name) {
         LOGGER.info("inside search {}", name);
         return tagService.search(name);
     }

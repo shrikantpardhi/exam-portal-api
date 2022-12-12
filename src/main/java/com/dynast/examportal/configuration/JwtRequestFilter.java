@@ -73,7 +73,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     .findByEmail(email)
                     .orElseThrow(() -> new NotFoundException("User not found." + email));
             List<String> roles = authService.getRoles(user);
-            final UserDetails userDetails = new User(email, "", roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+            final UserDetails userDetails = new User(user.getUserId(), "", roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             usernamePasswordAuthenticationToken.setDetails(buildDetails);

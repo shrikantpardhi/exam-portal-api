@@ -18,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -25,7 +26,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "answer")
-public class Answer {
+public class Answer  implements Serializable {
 
     @Id
     @GeneratedValue(generator = "system-uuid")

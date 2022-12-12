@@ -3,6 +3,7 @@ package com.dynast.examportal.controller;
 import com.dynast.examportal.dto.ExamDto;
 import com.dynast.examportal.service.ExamService;
 import io.swagger.annotations.*;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,57 +17,66 @@ public class ExamController extends ApplicationController {
         this.examService = examService;
     }
 
-    @ApiOperation(value = "This is used to create an exam")
+    @ApiOperation(value = "Create an exam")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created"),
             @ApiResponse(code = 422, message = "Unable to process request")
     })
-    @PostMapping("create")
+    @PostMapping(value = {"create"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ExamDto createExam(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
         exam.setUserDto(getUserDto());
         return examService.create(exam);
     }
 
-    @ApiOperation(value = "This is used to upate an exam")
+    @ApiOperation(value = "Update an exam")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully Updated"),
             @ApiResponse(code = 422, message = "Unable to process request")
     })
-    @PutMapping("update")
+    @PutMapping(value = {"update"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ExamDto updateExam(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
         exam.setUserDto(getUserDto());
         return examService.update(exam);
     }
 
-    @ApiOperation(value = "This is used to delete an exam")
+    @ApiOperation(value = "Delete an exam")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully Deleted"),
             @ApiResponse(code = 422, message = "Unable to delete")
     })
-    @DeleteMapping("{examId}")
+    @DeleteMapping(value = {"{examId}"})
     public void deleteExam(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
         examService.delete(examId);
     }
 
-    @ApiOperation(value = "This is used to get list of Exmas")
+    @ApiOperation(value = "Get list of Exams")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully fetched"),
             @ApiResponse(code = 404, message = "No data found")
     })
-    @GetMapping("all")
+    @GetMapping(value = {"all"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public Iterable<ExamDto> getAllExam() {
         return examService.getAll();
     }
 
-    @ApiOperation(value = "This is used to get an Exam by exam id")
+    @ApiOperation(value = "Get an Exam by exam id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully fetched"),
             @ApiResponse(code = 404, message = "No data found")
     })
-    @GetMapping("{examId}")
+    @GetMapping(value = {"{examId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ExamDto getOneExam(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
-        return examService.getOne(examId);
+        return examService.findByExamId(examId);
     }
 
-
+    @ApiOperation(value = "Change an Exam active status")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Status Updated"),
+            @ApiResponse(code = 404, message = "No data found")
+    })
+    @PostMapping(value = {"change-status"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ExamDto changeStatus(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
+        exam.setUserDto(getUserDto());
+        return examService.changeStatus(exam);
+    }
 }

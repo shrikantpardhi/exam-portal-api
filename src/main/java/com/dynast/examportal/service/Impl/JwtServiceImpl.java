@@ -1,6 +1,7 @@
 package com.dynast.examportal.service.Impl;
 
 import com.dynast.examportal.configuration.AuthService;
+import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.model.JwtRequest;
 import com.dynast.examportal.model.JwtResponse;
 import com.dynast.examportal.model.User;
@@ -48,7 +49,7 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
                         () -> new UsernameNotFoundException("User not found with username: " + userId)
                 );
         return new org.springframework.security.core.userdetails.User(
-                String.valueOf(user.getUserId()),
+                user.getUserId(),
                 user.getPassword(),
                 authService.getRoles(user).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
         );
@@ -56,7 +57,7 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
 
     private User loadUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
+                .orElseThrow(() -> new NotFoundException("Email not found"));
 
     }
 

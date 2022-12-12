@@ -105,6 +105,7 @@ public class UserController {
             @ApiResponse(code = 404, message = "Not found - The user was not found")
     })
     @GetMapping({"get/email/{emailId}"})
+    @PreAuthorize("hasRole('Admin')")
     public UserDto getUser(@ApiParam(name = "emailId", required = true) @PathVariable String emailId) {
         LOGGER.info("inside getUser :" + emailId);
         return userService.getUserByEmailId(emailId);
@@ -116,8 +117,8 @@ public class UserController {
             @ApiResponse(code = 200, message = "Successfully retrieved"),
             @ApiResponse(code = 404, message = "Not found - The user was not found")
     })
-    @GetMapping(value = "get/id/{userId}", name = "This is used to get user details by email id")
-    @PreAuthorize("hasAnyRole('Admin', 'User', 'Educator')")
+    @GetMapping(value = "get/id/{userId}")
+    @PreAuthorize("hasRole('Admin')")
     public UserDto getUserDetail(@ApiParam(name = "userId", required = true) @PathVariable String userId) {
         LOGGER.info("inside getUser :" + userId);
         return userService.getUserById(userId);

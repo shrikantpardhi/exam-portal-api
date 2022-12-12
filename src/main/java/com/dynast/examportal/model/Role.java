@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Role {
+public class Role  implements Serializable {
     @Id
     @NotBlank(message = "Role is mandatory")
     private String roleName;

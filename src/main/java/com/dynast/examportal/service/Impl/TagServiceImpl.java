@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -23,6 +23,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public Tag create(@NonNull Tag tag) {
         LOGGER.info("inside create: {}", tag.getName());
+        tag.setName(tag.getName().toUpperCase());
         return tagRepository.save(tag);
     }
 
@@ -33,7 +34,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> search(String name) {
+    public Set<Tag> search(String name) {
         LOGGER.info("inside search tag: {}", name);
         return tagRepository.findByNameContainingIgnoreCase(name);
     }

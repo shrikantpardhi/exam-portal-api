@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface EducatorRepository extends JpaRepository<EducatorCode, String> {
 
     Optional<EducatorCode> findByCode(String code);
+
 }

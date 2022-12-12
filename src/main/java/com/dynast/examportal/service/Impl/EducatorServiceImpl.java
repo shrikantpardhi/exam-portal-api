@@ -43,6 +43,7 @@ public class EducatorServiceImpl implements EducatorService {
         LOGGER.info("inside update: " + educatorCode.getCode());
         return educatorRepository.findById(educatorCode.getCodeId()).map(eCode -> {
             eCode.setCode(educatorCode.getCode());
+            eCode.setDescription(educatorCode.getDescription());
             return educatorRepository.save(eCode);
         }).orElseThrow(() -> {
             LOGGER.info("error in update : " + educatorCode.getCode());

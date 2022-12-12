@@ -2,14 +2,18 @@ package com.dynast.examportal.service;
 
 import com.dynast.examportal.dto.ExamDto;
 
-public interface ExamService {
-    ExamDto create(ExamDto exam);
+import java.util.List;
 
-    ExamDto update(ExamDto exam);
+public interface ExamService {
+    ExamDto create(ExamDto examDto);
+
+    ExamDto update(ExamDto examDto);
 
     void delete(String examId);
 
-    Iterable<ExamDto> getAll();
+    List<ExamDto> getAll();
 
-    ExamDto getOne(String examId);
+    ExamDto findByExamId(String examId);
+
+    ExamDto changeStatus(ExamDto examDto);
 }

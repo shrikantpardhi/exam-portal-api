@@ -1,13 +1,17 @@
 package com.dynast.examportal.dto;
 
+import com.dynast.examportal.model.EducatorCode;
+import com.dynast.examportal.model.Tag;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +20,7 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExamDto implements Serializable {
     private String examId;
-    private TagDto tagDto;
+    private Set<Tag> tags;
     private String examTitle;
     private String examDescription;
     private Boolean isNegativeAllowed;
@@ -25,7 +29,8 @@ public class ExamDto implements Serializable {
     private Date examStartDate;
     private Date examEndDate;
     private Boolean isPaid;
-    private String educatorCode;
+    private EducatorCode educatorCode;
     private int totalQuestions;
+    @JsonProperty("user")
     private UserDto userDto;
 }
