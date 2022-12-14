@@ -15,5 +15,7 @@ public interface ExamService {
 
     ExamDto findByExamId(String examId);
 
-    ExamDto changeStatus(ExamDto examDto);
+    ExamDto changeStatus(String examId);
+
+//    List<ExamDto>
 }

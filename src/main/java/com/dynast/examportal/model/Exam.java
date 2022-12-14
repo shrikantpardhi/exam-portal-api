@@ -4,24 +4,27 @@ import com.dynast.examportal.util.AbstractTimestampEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.CascadeType;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -46,12 +49,12 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     private Date examEndDate;
     private Boolean isPaid;
 
-    @ManyToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name = "codeId", referencedColumnName = "codeId", foreignKey = @ForeignKey(name="FK_EXAM_EDUCATOR_CODE"))
+    @OneToOne(fetch = FetchType.EAGER, cascade= {CascadeType.REMOVE, CascadeType.PERSIST})
+    @JoinColumn(name = "codeId", referencedColumnName = "codeId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private EducatorCode educatorCode;
 
 //    allow educator or admin to create exam
-    @OneToOne(cascade= CascadeType.MERGE)
+    @OneToOne(fetch = FetchType.EAGER, cascade= {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinColumn(name="userId", referencedColumnName = "userId", foreignKey = @ForeignKey(name="FK_EXAM_USER"))
     private User user;
     private Boolean status = true;

@@ -15,21 +15,21 @@ public abstract class AbstractTimestampEntity {
     //DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created", nullable = true)
-    private Date createdAt;
+    private Date created;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated", nullable = true)
-    private Date updatedAt;
+    private Date updated;
 
     @PrePersist
     protected void onCreate() {
-        updatedAt = new Date();
-        createdAt = new Date();
+        updated = new Date();
+        created = new Date();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = new Date();
+        updated = new Date();
     }
 
 

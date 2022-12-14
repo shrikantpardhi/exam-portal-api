@@ -1,4 +1,4 @@
-package com.dynast.examportal.service.Impl;
+package com.dynast.examportal.service.impl;
 
 import com.dynast.examportal.dto.QuestionDto;
 import com.dynast.examportal.repository.AnswerRepository;

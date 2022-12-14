@@ -74,9 +74,8 @@ public class ExamController extends ApplicationController {
             @ApiResponse(code = 200, message = "Status Updated"),
             @ApiResponse(code = 404, message = "No data found")
     })
-    @PostMapping(value = {"change-status"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ExamDto changeStatus(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
-        exam.setUserDto(getUserDto());
-        return examService.changeStatus(exam);
+    @PostMapping(value = {"{examId}/change-status"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ExamDto changeStatus(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
+        return examService.changeStatus(examId);
     }
 }

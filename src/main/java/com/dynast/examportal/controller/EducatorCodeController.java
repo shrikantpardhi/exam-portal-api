@@ -1,9 +1,11 @@
 package com.dynast.examportal.controller;
 
-import com.dynast.examportal.model.EducatorCode;
+import com.dynast.examportal.dto.EducatorCodeDto;
 import com.dynast.examportal.service.EducatorService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,13 +17,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.logging.Logger;
-
 @RestController
 @Api(value = "Educator Code APIs", tags = {"Educator Controller"})
 @RequestMapping(value = "/api/v1/educator-code/")
 public class EducatorCodeController extends ApplicationController {
-    private static final Logger LOGGER = Logger.getLogger(EducatorCodeController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EducatorCodeController.class);
 
     private final EducatorService educatorService;
 
@@ -30,35 +30,35 @@ public class EducatorCodeController extends ApplicationController {
     }
 
 
-    @GetMapping("all")
+    @GetMapping(value = {"all"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('Admin')")
 //    @PreAuthorize("hasAnyRole('Admin', 'Educator')")
-    Iterable<EducatorCode> getAll() {
-        LOGGER.info("inside getUsers{}");
+    Iterable<EducatorCodeDto> getAll() {
+        LOGGER.info("inside getAll");
         return educatorService.fetchAll();
     }
 
-    @GetMapping({"get/{code}"})
-    public EducatorCode getEducatorCode(@ApiParam(name = "code", required = true) @PathVariable String code) {
-        LOGGER.info("inside getEducatorCode :" + code);
+    @GetMapping(value = {"get/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public EducatorCodeDto getEducatorCode(@ApiParam(name = "code", required = true) @PathVariable String code) {
+        LOGGER.info("inside getEducatorCode :{} ", code);
         return educatorService.fetchByCode(code);
     }
 
     @PostMapping(value = {"create"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public EducatorCode createEducatorCode(@ApiParam(name = "educatorCode", required = true) @RequestBody EducatorCode educatorCode) {
-        LOGGER.info("inside createEducatorCode :" + educatorCode.getCode());
+    public EducatorCodeDto createEducatorCode(@ApiParam(name = "educatorCode", required = true) @RequestBody EducatorCodeDto educatorCode) {
+        LOGGER.info("inside createEducatorCode :{} ", educatorCode.getCode());
         return educatorService.create(educatorCode, getUser());
     }
 
     @PutMapping(value = {"update"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public EducatorCode updateEducatorCode(@ApiParam(name = "educatorCode", required = true) @RequestBody EducatorCode educatorCode) {
-        LOGGER.info("inside updateEducatorCode :" + educatorCode.getCode());
+    public EducatorCodeDto updateEducatorCode(@ApiParam(name = "educatorCode", required = true) @RequestBody EducatorCodeDto educatorCode) {
+        LOGGER.info("inside updateEducatorCode :{} ", educatorCode.getCode());
         return educatorService.update(educatorCode, getUser());
     }
 
     @DeleteMapping(value = {"delete"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void deleteEducatorCode(@ApiParam(name = "educatorCode", required = true) @RequestBody EducatorCode educatorCode) {
-        LOGGER.info("inside deleteEducatorCode :" + educatorCode.getCode());
+    public void deleteEducatorCode(@ApiParam(name = "educatorCode", required = true) @RequestBody EducatorCodeDto educatorCode) {
+        LOGGER.info("inside deleteEducatorCode :{} ", educatorCode.getCode());
         educatorService.delete(educatorCode);
     }
 

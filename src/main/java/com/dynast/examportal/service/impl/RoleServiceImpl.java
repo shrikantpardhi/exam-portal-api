@@ -1,4 +1,4 @@
-package com.dynast.examportal.service.Impl;
+package com.dynast.examportal.service.impl;
 
 import com.dynast.examportal.model.Role;
 import com.dynast.examportal.service.RoleService;

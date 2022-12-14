@@ -1,7 +1,8 @@
-package com.dynast.examportal.service.Impl;
+package com.dynast.examportal.service.impl;
 
 import com.dynast.examportal.dto.UserDto;
 import com.dynast.examportal.exception.NotFoundException;
+import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.Role;
 import com.dynast.examportal.model.User;
 import com.dynast.examportal.repository.RoleRepository;
@@ -10,6 +11,8 @@ import com.dynast.examportal.service.UserService;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.dynast.examportal.util.Roles;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,11 +22,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 @Service
 public class UserServiceImpl extends RoleServiceImpl implements UserService {
-    private static final Logger LOGGER = Logger.getLogger(UserServiceImpl.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private final UserRepository userRepository;
     @Autowired
@@ -61,18 +63,19 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
     @Override
     public Iterable<UserDto> getUsers() {
         LOGGER.info("inside getUsers.");
-        Iterable<User> users = userRepository.findAll(Sort.by(Sort.Order.desc("createdAt")));
+        Iterable<User> users = userRepository.findAll(Sort.by(Sort.Order.desc("created")));
         return mapUserListToUserDtoList(users);
     }
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        LOGGER.info("inside createUser: " + userDto.getEmail());
+        LOGGER.info("inside createUser: {}", userDto.getEmail());
         User user = mapper.convertValue(userDto, User.class);
         user.setRole(getUserRole());
         user.setPassword(getEncodedPassword(userDto.getPassword()));
         if (validateIfExist(userDto.getEmail(), userDto.getMobile())) {
-            LOGGER.info("User already exist: " + userDto.getEmail());
+            LOGGER.error("User already exist: {}", userDto.getEmail());
+            throw new UnprocessableEntityException("Email or Mobile is already present.");
         } else {
             user = userRepository.save(user);
         }
@@ -81,12 +84,13 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
 
     @Override
     public UserDto createEducator(UserDto userDto) {
-        LOGGER.info("inside createEducator: " + userDto.getEmail());
+        LOGGER.info("inside createEducator: {}", userDto.getEmail());
         User user = mapper.convertValue(userDto, User.class);
         user.setRole(getEducatorRole());
         user.setPassword(getEncodedPassword(userDto.getPassword()));
         if (validateIfExist(userDto.getEmail(), userDto.getMobile())) {
-            LOGGER.info("User already exist: " + userDto.getEmail());
+            LOGGER.info("Educator already exist: {}", userDto.getEmail());
+            throw new UnprocessableEntityException("Email or Mobile is already present.");
         } else {
             user = userRepository.save(user);
         }
@@ -95,7 +99,7 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto userDto) {
-        LOGGER.info("inside updateUser" + userDto.getEmail());
+        LOGGER.info("inside updateUser: {}", userDto.getEmail());
         return userRepository.findById(userDto.getUserId()).map(u -> {
             u.setFirstName(userDto.getFirstName());
             u.setLastName(userDto.getLastName());
@@ -108,15 +112,18 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
             u.setStatus(userDto.getStatus());
             return mapper.convertValue(userRepository.save(u), UserDto.class);
         }).orElseGet(() -> {
-            LOGGER.info("No user found. Creating a user." + userDto.getEmail());
+            LOGGER.info("No user found. Creating a user. {}", userDto.getEmail());
             return createUser(userDto);
         });
     }
 
     @Override
-    public Boolean updatePassword(UserDto userDto) {
-        LOGGER.info("inside updatePassword: " + userDto.getEmail());
-        User user = userRepository.findById(userDto.getUserId()).orElseThrow(() -> new NotFoundException("No user found"));
+    public boolean updatePassword(UserDto userDto) {
+        LOGGER.info("inside updatePassword: {}", userDto.getEmail());
+        User user = userRepository.findById(userDto.getUserId()).orElseThrow(() -> {
+            LOGGER.error("No User Found {}", userDto.getEmail());
+            throw new NotFoundException();
+        });
         if (user.getPassword().equals(getEncodedPassword(userDto.getPassword()))) {
             user.setPassword(getEncodedPassword(userDto.getPassword()));
             userRepository.save(user);
@@ -128,9 +135,12 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean resetPassword(String emailId) {
-        LOGGER.info("inside resetPassword: " + emailId);
-        User user = userRepository.findByEmail(emailId).orElseThrow(() -> new NotFoundException("No user found"));
+    public boolean resetPassword(String emailId) {
+        LOGGER.info("inside resetPassword: {}", emailId);
+        User user = userRepository.findByEmail(emailId).orElseThrow(() -> {
+            LOGGER.error("No User Found {}", emailId);
+            throw new NotFoundException();
+        });
         /*
         * send an email to reset password*/
         return true;
@@ -138,34 +148,40 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
 
     @Override
     public UserDto getUserByEmailId(String emailId) {
-        LOGGER.info("inside getUserByEmailId: " + emailId);
-        User user = userRepository.findByEmail(emailId).orElseThrow(() -> new NotFoundException("No user found"));
+        LOGGER.info("inside getUserByEmailId: {}", emailId);
+        User user = userRepository.findByEmail(emailId).orElseThrow(() -> {
+            LOGGER.error("No User Found {}", emailId);
+            throw new NotFoundException();
+        });
         return mapper.convertValue(user, UserDto.class);
     }
 
     @Override
     public UserDto getUserById(String userId) {
-        LOGGER.info("inside getUserById: " + userId);
+        LOGGER.info("inside getUserById: {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new NotFoundException("User not found with username: " + userId)
-                );
-        UserDto userDto = mapper.convertValue(user, UserDto.class);
-        return userDto;
+                .orElseThrow(() -> {
+                    LOGGER.error("No User Found {}", userId);
+                    throw new NotFoundException();
+                });
+        return mapper.convertValue(user, UserDto.class);
     }
 
     @Override
-    public Boolean changeStatus(String userId) {
-        LOGGER.info("inside disableUser: " + userId);
+    public boolean changeStatus(String userId) {
+        LOGGER.info("inside changeStatus: {}", userId);
         User user = userRepository.findById(userId).map(user1 -> {
             user1.setStatus(!user1.getStatus());
             return userRepository.save(user1);
-        }).orElseThrow(() -> new NotFoundException("No user found."));
+        }).orElseThrow(() -> {
+            LOGGER.error("No User Found {}", userId);
+            throw new NotFoundException();
+        });
         return !user.getStatus();
     }
 
     @Override
-    public Boolean validateIfExist(String emailId, String mobile) {
+    public boolean validateIfExist(String emailId, String mobile) {
         return userRepository.findByEmailOrMobile(emailId, mobile).isPresent();
     }
 

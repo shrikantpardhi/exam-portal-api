@@ -4,8 +4,9 @@ import com.dynast.examportal.util.AbstractTimestampEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.CascadeType;
@@ -23,7 +24,8 @@ import javax.persistence.ManyToMany;
 import java.io.Serializable;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -64,7 +66,7 @@ public class User extends AbstractTimestampEntity implements Serializable {
     )
     private Set<Role> role;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE})
 //    @NotFound(action = NotFoundAction.IGNORE)
     @JoinTable(name = "USER_EDUCATOR_CODE",
             joinColumns = {

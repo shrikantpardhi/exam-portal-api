@@ -1,8 +1,8 @@
-package com.dynast.examportal.service.Impl;
+package com.dynast.examportal.service.impl;
 
 import com.dynast.examportal.dto.ExamDto;
-import com.dynast.examportal.dto.UserDto;
 import com.dynast.examportal.exception.NotFoundException;
+import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.EducatorCode;
 import com.dynast.examportal.model.Exam;
 import com.dynast.examportal.model.Tag;
@@ -52,7 +52,11 @@ public class ExamServiceImpl implements ExamService {
         List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName()).collect(Collectors.toList());
         Set<Tag> finalTags = getFinalTags(examTags, tagNames);
         User user = mapper.convertValue(examDto.getUserDto(), User.class);
-        EducatorCode educatorCode = educatorRepository.findByCode(examDto.getEducatorCode().getCode()).orElseThrow(() -> new NotFoundException("No Educator Code found. "+ examDto.getEducatorCode().getCode()));
+        EducatorCode educatorCode = educatorRepository.findByCode(examDto.getEducatorCode().getCode())
+                .orElseThrow(() -> {
+                    LOGGER.info("Educator code not found. {}", examDto.getEducatorCode().getCode());
+                    throw new NotFoundException("No Educator Code found. " + examDto.getEducatorCode().getCode());
+                });
         Exam exam = mapper.convertValue(examDto, Exam.class);
         exam.setEducatorCode(educatorCode);
         exam.setUser(user);
@@ -64,16 +68,20 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public ExamDto update(ExamDto examDto) {
-        LOGGER.info("inside update {}", examDto.getExamTitle());
+        LOGGER.info("inside update {}", examDto.getExamId());
         Set<Tag> examTags = examDto.getTags();
         List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName()).collect(Collectors.toList());
         Set<Tag> finalTags = getFinalTags(examTags, tagNames);
-        return examRepository.findById(examDto.getExamId()).map(exam -> {
-            exam = mapper.convertValue(examDto, Exam.class);
-            exam.setTags(finalTags);
-            exam.setUser(mapper.convertValue(examDto.getUserDto(), User.class));
-            return mapper.convertValue(examRepository.save(exam), ExamDto.class);
-        }).orElseThrow(() -> new NotFoundException("No Exam found!." + examDto.getExamTitle()));
+        Exam exam = examRepository.findById(examDto.getExamId()).map(e -> {
+            e = mapper.convertValue(examDto, Exam.class);
+            e.setTags(finalTags);
+            return examRepository.save(e);
+        }).orElseThrow(() -> {
+            LOGGER.info("Unable to update an Exam. {}", examDto.getExamId());
+            throw new UnprocessableEntityException("Unable to update an Exam");
+        });
+        ExamDto dto = mapper.convertValue(exam, ExamDto.class);
+        return dto;
     }
 
     @Override
@@ -89,7 +97,6 @@ public class ExamServiceImpl implements ExamService {
         List<ExamDto> examDtos = new ArrayList<>();
         exams.forEach(exam -> {
                     ExamDto examDto = mapper.convertValue(exam, ExamDto.class);
-                    examDto.setUserDto(mapper.convertValue(exam.getUser(), UserDto.class));
                     examDtos.add(examDto);
                 }
         );
@@ -99,15 +106,25 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public ExamDto findByExamId(String examId) {
         LOGGER.info("inside findByExamId {}", examId);
-        Exam exam = examRepository.findByExamId(examId).get();//.orElseThrow(() -> new NotFoundException("No exam found!. " + examId));
-        ExamDto examDto = mapper.convertValue(exam, ExamDto.class);
-        examDto.setUserDto(mapper.convertValue(exam.getUser(), UserDto.class));
-        return examDto;
+        Exam exam = examRepository.findByExamId(examId)
+                .orElseThrow(() -> {
+                    LOGGER.info("no Exam found. {}", examId);
+                    throw new NotFoundException("No Exam Found.");
+                });
+        return mapper.convertValue(exam, ExamDto.class);
     }
 
     @Override
-    public ExamDto changeStatus(ExamDto examDto) {
-        return null;
+    public ExamDto changeStatus(String examId) {
+        LOGGER.info("In changeStatus. {}", examId);
+        Exam exam = examRepository.findById(examId).map(exam1 -> {
+            exam1.setStatus(!exam1.getStatus());
+            return examRepository.save(exam1);
+        }).orElseThrow(() -> {
+            LOGGER.info("Unable to change status an Exam. {}", examId);
+            throw new UnprocessableEntityException("Unable to change status an Exam.");
+        });
+        return mapper.convertValue(exam, ExamDto.class);
     }
 
     private Set<Tag> getFinalTags(Set<Tag> tagSet, List<String> tagNames) {

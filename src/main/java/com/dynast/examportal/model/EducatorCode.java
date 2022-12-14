@@ -4,8 +4,9 @@ import com.dynast.examportal.util.AbstractTimestampEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -14,7 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,4 +33,10 @@ public class EducatorCode extends AbstractTimestampEntity implements Serializabl
     private String code;
 
     private String description;
+
+    /*
+    * isProtected -> to protect Educator Code.
+    * true -> No user can find an exam by code. Educator need to associate Educator code for User.
+    * false -> User can find exams by Educator Code.*/
+    private Boolean isProtected = false;
 }
