@@ -1,16 +1,16 @@
 package com.dynast.examportal.service;
 
-import com.dynast.examportal.model.Tag;
+import com.dynast.examportal.dto.TagDto;
 import lombok.NonNull;
 
 import java.util.Set;
 
 public interface TagService {
-    Tag create(@NonNull Tag tag);
+    TagDto create(@NonNull TagDto tag);
 
-    void delete(@NonNull Tag tag);
+    void delete(@NonNull TagDto tag);
 
-    Set<Tag> search(String name);
+    Set<TagDto> search(String name);
 
-    Iterable<Tag> all();
+    Iterable<TagDto> all();
 }

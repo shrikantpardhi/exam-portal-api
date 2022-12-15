@@ -13,6 +13,7 @@ public interface UserService  {
     UserDto getUserById(String userId);
     boolean changeStatus(String userId);
     boolean validateIfExist(String emailId, String mobile);
-
+    boolean validateIfEmailExist(String emailId);
+    boolean validateIfMobileExist(String mobile);
     void initRoleAndUser();
 }

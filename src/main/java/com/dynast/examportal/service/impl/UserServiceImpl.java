@@ -53,7 +53,7 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
         user.setEmail("admin@gmail.com");
         user.setMobile("8975307295");
         user.setPassword(getEncodedPassword("password"));
-        user.setRole(role);
+        user.setRoles(role);
         if (!userRepository.findByEmail(user.getEmail()).isPresent()) {
             userRepository.save(user);
         }
@@ -71,7 +71,7 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
         LOGGER.info("inside createUser: {}", userDto.getEmail());
         User user = mapper.convertValue(userDto, User.class);
-        user.setRole(getUserRole());
+        user.setRoles(getUserRole());
         user.setPassword(getEncodedPassword(userDto.getPassword()));
         if (validateIfExist(userDto.getEmail(), userDto.getMobile())) {
             LOGGER.error("User already exist: {}", userDto.getEmail());
@@ -86,7 +86,7 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
     public UserDto createEducator(UserDto userDto) {
         LOGGER.info("inside createEducator: {}", userDto.getEmail());
         User user = mapper.convertValue(userDto, User.class);
-        user.setRole(getEducatorRole());
+        user.setRoles(getEducatorRole());
         user.setPassword(getEncodedPassword(userDto.getPassword()));
         if (validateIfExist(userDto.getEmail(), userDto.getMobile())) {
             LOGGER.info("Educator already exist: {}", userDto.getEmail());
@@ -183,6 +183,18 @@ public class UserServiceImpl extends RoleServiceImpl implements UserService {
     @Override
     public boolean validateIfExist(String emailId, String mobile) {
         return userRepository.findByEmailOrMobile(emailId, mobile).isPresent();
+    }
+
+    @Override
+    public boolean validateIfEmailExist(String emailId) {
+        LOGGER.info("inside validateIfEmailExist: {}", emailId);
+        return userRepository.findByEmail(emailId).isPresent();
+    }
+
+    @Override
+    public boolean validateIfMobileExist(String mobile) {
+        LOGGER.info("inside validateIfMobileExist: {}", mobile);
+        return userRepository.findByMobile(mobile).isPresent();
     }
 
     private List<UserDto> mapUserListToUserDtoList(Iterable<User> users) {

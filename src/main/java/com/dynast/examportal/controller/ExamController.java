@@ -3,13 +3,18 @@ package com.dynast.examportal.controller;
 import com.dynast.examportal.dto.ExamDto;
 import com.dynast.examportal.service.ExamService;
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Api(value = "Exam APIs", tags = {"Exam Controller"})
 @RequestMapping(value = "/api/v1/exam/")
 public class ExamController extends ApplicationController {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ExamController.class);
 
     private final ExamService examService;
 
@@ -24,7 +29,8 @@ public class ExamController extends ApplicationController {
     })
     @PostMapping(value = {"create"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ExamDto createExam(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
-        exam.setUserDto(getUserDto());
+        LOGGER.info("in create exam {}", exam.getExamTitle());
+        exam.setUser(getUserDto());
         return examService.create(exam);
     }
 
@@ -35,7 +41,8 @@ public class ExamController extends ApplicationController {
     })
     @PutMapping(value = {"update"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ExamDto updateExam(@ApiParam(name = "exam", required = true) @RequestBody ExamDto exam) {
-        exam.setUserDto(getUserDto());
+        LOGGER.info("in update exam {}", exam.getExamId());
+        exam.setUser(getUserDto());
         return examService.update(exam);
     }
 
@@ -46,6 +53,7 @@ public class ExamController extends ApplicationController {
     })
     @DeleteMapping(value = {"{examId}"})
     public void deleteExam(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
+        LOGGER.info("in delete exam {}", examId);
         examService.delete(examId);
     }
 
@@ -56,6 +64,7 @@ public class ExamController extends ApplicationController {
     })
     @GetMapping(value = {"all"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public Iterable<ExamDto> getAllExam() {
+        LOGGER.info("in get all exam.");
         return examService.getAll();
     }
 
@@ -66,7 +75,8 @@ public class ExamController extends ApplicationController {
     })
     @GetMapping(value = {"{examId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ExamDto getOneExam(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
-        return examService.findByExamId(examId);
+        LOGGER.info("in get one exam {}", examId);
+        return examService.getByExamId(examId);
     }
 
     @ApiOperation(value = "Change an Exam active status")
@@ -76,6 +86,19 @@ public class ExamController extends ApplicationController {
     })
     @PostMapping(value = {"{examId}/change-status"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ExamDto changeStatus(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
+        LOGGER.info("in change exam status {}", examId);
         return examService.changeStatus(examId);
+    }
+
+    @PostMapping(value = {"code/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ExamDto> getByEducatorCode(@ApiParam(name = "code", required = true) @PathVariable String code) {
+        LOGGER.info("in get exam by educator code {}", code);
+        return examService.getByEducatorCode(code);
+    }
+
+    @PostMapping(value = {"user/{userId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ExamDto> getByUser(@ApiParam(name = "userId", required = true) @PathVariable String userId) {
+        LOGGER.info("in get exam by userId {}", userId);
+        return examService.getByUser(userId);
     }
 }

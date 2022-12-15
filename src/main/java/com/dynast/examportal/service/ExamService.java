@@ -13,9 +13,12 @@ public interface ExamService {
 
     List<ExamDto> getAll();
 
-    ExamDto findByExamId(String examId);
+    List<ExamDto> getByEducatorCode(String code);
+
+    List<ExamDto> getByUser(String userId);
+
+    ExamDto getByExamId(String examId);
 
     ExamDto changeStatus(String examId);
 
-//    List<ExamDto>
 }

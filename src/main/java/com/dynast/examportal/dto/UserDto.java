@@ -1,9 +1,9 @@
 package com.dynast.examportal.dto;
 
-import com.dynast.examportal.model.EducatorCode;
 import com.dynast.examportal.model.Role;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +29,8 @@ public class UserDto implements Serializable {
     private String state;
     private String education;
     private Boolean status;
-    private Set<Role> role;
-    private Set<EducatorCode> educatorCode;
+    @JsonProperty("roles")
+    private Set<Role> roles;
+    @JsonProperty("educatorCodes")
+    private Set<EducatorCodeDto> educatorCodes;
 }

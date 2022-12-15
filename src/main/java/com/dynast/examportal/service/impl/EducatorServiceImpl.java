@@ -39,8 +39,8 @@ public class EducatorServiceImpl implements EducatorService {
         EducatorCode educatorCode = mapper.convertValue(educatorCodeDto, EducatorCode.class);
         educatorCode = educatorRepository.save(educatorCode);
         educatorCodes.add(educatorCode);
-        educatorCodes.addAll(user.getEducatorCode());
-        user.setEducatorCode(educatorCodes);
+        educatorCodes.addAll(user.getEducatorCodes());
+        user.setEducatorCodes(educatorCodes);
         userRepository.saveAndFlush(user);
         return mapper.convertValue(educatorCode, EducatorCodeDto.class);
     }

@@ -1,8 +1,8 @@
 package com.dynast.examportal.dto;
 
-import com.dynast.examportal.model.Exam;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +17,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResultPageDto {
     private List<ResultData> resultDataList;
-    private Exam exam;
+    @JsonProperty("exam")
+    private ExamDto exam;
     private String obtainedMark;
     private String negativeMark;
     private Date startAt;

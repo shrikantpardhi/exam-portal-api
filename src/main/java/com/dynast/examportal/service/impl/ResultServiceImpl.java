@@ -52,12 +52,12 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public UserResultDto create(UserResultDto userResult) {
+    public UserResultDto create(UserResultDto userResultDto) {
         return null;
     }
 
     @Override
-    public UserResultDto update(UserResultDto userResult) {
+    public UserResultDto update(UserResultDto userResultDto) {
         return null;
     }
 }

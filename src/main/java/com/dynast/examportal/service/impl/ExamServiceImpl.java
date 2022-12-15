@@ -1,6 +1,7 @@
 package com.dynast.examportal.service.impl;
 
 import com.dynast.examportal.dto.ExamDto;
+import com.dynast.examportal.dto.TagDto;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.EducatorCode;
@@ -11,6 +12,7 @@ import com.dynast.examportal.repository.EducatorRepository;
 import com.dynast.examportal.repository.ExamRepository;
 import com.dynast.examportal.repository.QuestionRepository;
 import com.dynast.examportal.repository.TagRepository;
+import com.dynast.examportal.repository.UserRepository;
 import com.dynast.examportal.service.ExamService;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,22 +38,26 @@ public class ExamServiceImpl implements ExamService {
 
     private final EducatorRepository educatorRepository;
 
+    private final UserRepository userRepository;
+
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
 
-    public ExamServiceImpl(ExamRepository examRepository, QuestionRepository questionRepository, TagRepository tagRepository, EducatorRepository educatorRepository) {
+    public ExamServiceImpl(ExamRepository examRepository, QuestionRepository questionRepository, TagRepository tagRepository, EducatorRepository educatorRepository, UserRepository userRepository) {
         this.examRepository = examRepository;
         this.questionRepository = questionRepository;
         this.tagRepository = tagRepository;
         this.educatorRepository = educatorRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public ExamDto create(ExamDto examDto) {
         LOGGER.info("inside create {}", examDto.getExamTitle());
-        Set<Tag> examTags = examDto.getTags();
+        Set<TagDto> tagDtos = examDto.getTags();
+        Set<Tag> tags = tagDtos.stream().map(tagDto -> mapper.convertValue(tagDto, Tag.class)).collect(Collectors.toSet());
         List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName()).collect(Collectors.toList());
-        Set<Tag> finalTags = getFinalTags(examTags, tagNames);
-        User user = mapper.convertValue(examDto.getUserDto(), User.class);
+        Set<Tag> finalTags = getFinalTags(tags, tagNames);
+        User user = mapper.convertValue(examDto.getUser(), User.class);
         EducatorCode educatorCode = educatorRepository.findByCode(examDto.getEducatorCode().getCode())
                 .orElseThrow(() -> {
                     LOGGER.info("Educator code not found. {}", examDto.getEducatorCode().getCode());
@@ -69,9 +75,10 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public ExamDto update(ExamDto examDto) {
         LOGGER.info("inside update {}", examDto.getExamId());
-        Set<Tag> examTags = examDto.getTags();
+        Set<TagDto> tagDtos = examDto.getTags();
+        Set<Tag> tags = tagDtos.stream().map(tagDto -> mapper.convertValue(tagDto, Tag.class)).collect(Collectors.toSet());
         List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName()).collect(Collectors.toList());
-        Set<Tag> finalTags = getFinalTags(examTags, tagNames);
+        Set<Tag> finalTags = getFinalTags(tags, tagNames);
         Exam exam = examRepository.findById(examDto.getExamId()).map(e -> {
             e = mapper.convertValue(examDto, Exam.class);
             e.setTags(finalTags);
@@ -104,7 +111,41 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public ExamDto findByExamId(String examId) {
+    public List<ExamDto> getByEducatorCode(String code) {
+        LOGGER.info("inside getByEducatorCode {}", code);
+        EducatorCode educatorCode = educatorRepository.findByCode(code)
+                .orElseThrow(() -> {
+                    LOGGER.error("No Educator Code found for code {}", code);
+                    throw new NotFoundException();
+                });
+        List<Exam> exams = examRepository.findAllByEducatorCode(educatorCode);
+        if (exams.isEmpty()) {
+            LOGGER.info("No exams found for educator code : {}", code);
+            return new ArrayList<>();
+        }
+        List<ExamDto> examDtos = new ArrayList<>();
+        exams.forEach(exam -> examDtos.add(mapper.convertValue(exam, ExamDto.class)));
+        LOGGER.info("Exams found {}", exams.size());
+        return examDtos;
+    }
+
+    @Override
+    public List<ExamDto> getByUser(String userId) {
+        LOGGER.info("inside getByUser {}", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    LOGGER.error("Error. No user found {}", userId);
+                    throw new NotFoundException();
+                });
+        List<Exam> exams = examRepository.findByUser(user);
+        List<ExamDto> examDtos = exams.stream().map(exam -> mapper.convertValue(exam, ExamDto.class)).collect(Collectors.toList());
+        LOGGER.info("return exams {}", examDtos.size());
+        return examDtos;
+    }
+
+
+    @Override
+    public ExamDto getByExamId(String examId) {
         LOGGER.info("inside findByExamId {}", examId);
         Exam exam = examRepository.findByExamId(examId)
                 .orElseThrow(() -> {

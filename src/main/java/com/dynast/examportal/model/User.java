@@ -64,7 +64,7 @@ public class User extends AbstractTimestampEntity implements Serializable {
                     @JoinColumn(name = "ROLE_ID")
             }, foreignKey = @ForeignKey(name = "FK_USER_ROLE")
     )
-    private Set<Role> role;
+    private Set<Role> roles;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE})
 //    @NotFound(action = NotFoundAction.IGNORE)
@@ -76,5 +76,5 @@ public class User extends AbstractTimestampEntity implements Serializable {
                     @JoinColumn(name = "CODE_ID")
             }, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
     )
-    private Set<EducatorCode> educatorCode;
+    private Set<EducatorCode> educatorCodes;
 }
