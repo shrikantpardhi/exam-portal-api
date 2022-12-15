@@ -1,4 +1,4 @@
-package com.dynast.examportal.common;
+package com.dynast.examportal.util;
 
 public enum AnswerStatus {
     TRUE("T"),

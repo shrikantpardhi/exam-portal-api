@@ -1,7 +1,7 @@
 package com.dynast.examportal.controller;
 
 import com.dynast.examportal.dto.EducatorCodeDto;
-import com.dynast.examportal.service.EducatorService;
+import com.dynast.examportal.service.EducatorCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class EducatorCodeController extends ApplicationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(EducatorCodeController.class);
 
-    private final EducatorService educatorService;
+    private final EducatorCodeService educatorService;
 
-    public EducatorCodeController(EducatorService educatorService) {
+    public EducatorCodeController(EducatorCodeService educatorService) {
         this.educatorService = educatorService;
     }
 

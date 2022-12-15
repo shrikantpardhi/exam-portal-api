@@ -22,7 +22,7 @@ public class QuestionDto implements Serializable {
     @JsonProperty("tags")
     private List<TagDto> tags;
     @JsonProperty("questionType")
-    private QuestionTypeDto questionType;
+    private String questionType;
     private String questionTitle;
     private String questionDescription;
     private String questionAnswerDescription;

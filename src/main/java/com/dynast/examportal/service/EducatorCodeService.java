@@ -5,7 +5,7 @@ import com.dynast.examportal.model.User;
 
 import java.util.List;
 
-public interface EducatorService {
+public interface EducatorCodeService {
     EducatorCodeDto create(EducatorCodeDto educatorCodeDto, User user);
     EducatorCodeDto update(EducatorCodeDto educatorCodeDto, User user);
     void delete(EducatorCodeDto educatorCodeDto);

@@ -45,9 +45,7 @@ public class Question extends AbstractTimestampEntity implements Serializable {
     @JoinColumn(name = "tagId", referencedColumnName = "tagId", foreignKey = @ForeignKey(name="FK_QUESTION_TAG"))
     private Tag tagId;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "questionTypeId", referencedColumnName = "questionTypeId", foreignKey = @ForeignKey(name="FK_QUESTION_TYPE"))
-    private QuestionType questionType;
+    private String questionType;
 
     @Type(type = "text")
     @NotNull(message = "Question Name is Mandatory")

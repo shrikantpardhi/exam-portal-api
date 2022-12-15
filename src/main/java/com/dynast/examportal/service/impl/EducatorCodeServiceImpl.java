@@ -7,7 +7,7 @@ import com.dynast.examportal.model.EducatorCode;
 import com.dynast.examportal.model.User;
 import com.dynast.examportal.repository.EducatorRepository;
 import com.dynast.examportal.repository.UserRepository;
-import com.dynast.examportal.service.EducatorService;
+import com.dynast.examportal.service.EducatorCodeService;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class EducatorServiceImpl implements EducatorService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EducatorServiceImpl.class);
+public class EducatorCodeServiceImpl implements EducatorCodeService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EducatorCodeServiceImpl.class);
 
     private final EducatorRepository educatorRepository;
     private final UserRepository userRepository;
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
 
-    public EducatorServiceImpl(EducatorRepository educatorRepository, UserRepository userRepository) {
+    public EducatorCodeServiceImpl(EducatorRepository educatorRepository, UserRepository userRepository) {
         this.educatorRepository = educatorRepository;
         this.userRepository = userRepository;
     }

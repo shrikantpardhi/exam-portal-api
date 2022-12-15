@@ -60,22 +60,22 @@ public class ExamController extends ApplicationController {
         return examService.getByExamId(examId);
     }
 
-    @ApiOperation(value = "Change an Exam active status")
-    @PostMapping(value = {"{examId}/change-status"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Change an Exam status")
+    @PutMapping(value = {"{examId}/change-status"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ExamDto changeStatus(@ApiParam(name = "examId", required = true) @PathVariable String examId) {
         LOGGER.info("in change exam status {}", examId);
         return examService.changeStatus(examId);
     }
 
     @ApiOperation(value = "Get exams by educator code.")
-    @PostMapping(value = {"code/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"code/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ExamDto> getByEducatorCode(@ApiParam(name = "code", required = true) @PathVariable String code) {
         LOGGER.info("in get exam by educator code {}", code);
         return examService.getByEducatorCode(code);
     }
 
     @ApiOperation(value = "Get exams by educator codes.")
-    @PostMapping(value = {"codes"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"codes"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ExamDto> getByEducatorCodes(@ApiParam(name = "educatorCodes", required = true) @RequestBody List<EducatorCodeDto> educatorCodes) {
         LOGGER.info("in get exam by lis of educator code {}", educatorCodes.size());
         return examService.getByEducatorCodes(educatorCodes);
@@ -86,14 +86,14 @@ public class ExamController extends ApplicationController {
             @ApiResponse(code = 200, message = "Successfully created"),
             @ApiResponse(code = 404, message = "No user found.")
     })
-    @PostMapping(value = {"user/{userId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"user/{userId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ExamDto> getByUser(@ApiParam(name = "userId", required = true) @PathVariable String userId) {
         LOGGER.info("in get exam by userId {}", userId);
         return examService.getByUser(userId);
     }
 
     @ApiOperation(value = "Get exams by user id and educator codes in user.")
-    @PostMapping(value = {"user/{userId}/codes"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"user/{userId}/codes"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ExamDto> getByUserEducatorCodes(@ApiParam(name = "userId", required = true) @PathVariable String userId) {
         LOGGER.info("in get exam by getByUserEducatorCodes {}", userId);
         return examService.getByUserEducatorCodes(userId);
