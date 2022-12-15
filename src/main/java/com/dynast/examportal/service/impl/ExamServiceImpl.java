@@ -1,7 +1,10 @@
 package com.dynast.examportal.service.impl;
 
+import com.dynast.examportal.dto.EducatorCodeDto;
 import com.dynast.examportal.dto.ExamDto;
 import com.dynast.examportal.dto.TagDto;
+import com.dynast.examportal.exception.EducatorCodeNotFoundException;
+import com.dynast.examportal.exception.ExamNotFoundException;
 import com.dynast.examportal.exception.NotFoundException;
 import com.dynast.examportal.exception.UnprocessableEntityException;
 import com.dynast.examportal.model.EducatorCode;
@@ -61,7 +64,7 @@ public class ExamServiceImpl implements ExamService {
         EducatorCode educatorCode = educatorRepository.findByCode(examDto.getEducatorCode().getCode())
                 .orElseThrow(() -> {
                     LOGGER.info("Educator code not found. {}", examDto.getEducatorCode().getCode());
-                    throw new NotFoundException("No Educator Code found. " + examDto.getEducatorCode().getCode());
+                    throw new EducatorCodeNotFoundException("No Educator Code found. " + examDto.getEducatorCode().getCode());
                 });
         Exam exam = mapper.convertValue(examDto, Exam.class);
         exam.setEducatorCode(educatorCode);
@@ -100,8 +103,8 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public List<ExamDto> getAll() {
         LOGGER.info("inside getAll");
-        Iterable<Exam> exams = examRepository.findAll();
         List<ExamDto> examDtos = new ArrayList<>();
+        Iterable<Exam> exams = examRepository.findAll();
         exams.forEach(exam -> {
                     ExamDto examDto = mapper.convertValue(exam, ExamDto.class);
                     examDtos.add(examDto);
@@ -113,18 +116,18 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public List<ExamDto> getByEducatorCode(String code) {
         LOGGER.info("inside getByEducatorCode {}", code);
+        List<ExamDto> examDtos = null;
         EducatorCode educatorCode = educatorRepository.findByCode(code)
                 .orElseThrow(() -> {
                     LOGGER.error("No Educator Code found for code {}", code);
-                    throw new NotFoundException();
+                    throw new EducatorCodeNotFoundException("Educator Code not found");
                 });
         List<Exam> exams = examRepository.findAllByEducatorCode(educatorCode);
         if (exams.isEmpty()) {
             LOGGER.info("No exams found for educator code : {}", code);
             return new ArrayList<>();
         }
-        List<ExamDto> examDtos = new ArrayList<>();
-        exams.forEach(exam -> examDtos.add(mapper.convertValue(exam, ExamDto.class)));
+        examDtos = exams.stream().map(exam -> mapper.convertValue(exam, ExamDto.class)).collect(Collectors.toList());
         LOGGER.info("Exams found {}", exams.size());
         return examDtos;
     }
@@ -132,13 +135,14 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public List<ExamDto> getByUser(String userId) {
         LOGGER.info("inside getByUser {}", userId);
+        List<ExamDto> examDtos = null;
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     LOGGER.error("Error. No user found {}", userId);
-                    throw new NotFoundException();
+                    throw new NotFoundException("User not found.");
                 });
         List<Exam> exams = examRepository.findByUser(user);
-        List<ExamDto> examDtos = exams.stream().map(exam -> mapper.convertValue(exam, ExamDto.class)).collect(Collectors.toList());
+        examDtos = exams.stream().map(exam -> mapper.convertValue(exam, ExamDto.class)).collect(Collectors.toList());
         LOGGER.info("return exams {}", examDtos.size());
         return examDtos;
     }
@@ -150,7 +154,7 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = examRepository.findByExamId(examId)
                 .orElseThrow(() -> {
                     LOGGER.info("no Exam found. {}", examId);
-                    throw new NotFoundException("No Exam Found.");
+                    throw new ExamNotFoundException("Exam not found.");
                 });
         return mapper.convertValue(exam, ExamDto.class);
     }
@@ -166,6 +170,38 @@ public class ExamServiceImpl implements ExamService {
             throw new UnprocessableEntityException("Unable to change status an Exam.");
         });
         return mapper.convertValue(exam, ExamDto.class);
+    }
+
+    @Override
+    public List<ExamDto> getByEducatorCodes(List<EducatorCodeDto> educatorCodeDtos) {
+        LOGGER.info("In getByEducatorCodes. {}", educatorCodeDtos.size());
+        List<ExamDto> examDtos = null;
+        Set<EducatorCode> educatorCodes = educatorCodeDtos.stream()
+                .map(educatorCodeDto -> mapper.convertValue(educatorCodeDto, EducatorCode.class))
+                .collect(Collectors.toSet());
+        List<Exam> exams = examRepository.findAllByEducatorCodeIn(educatorCodes);
+        examDtos = exams.stream()
+                .map(exam -> mapper.convertValue(exam, ExamDto.class))
+                .collect(Collectors.toList());
+        return examDtos;
+    }
+
+    @Override
+    public List<ExamDto> getByUserEducatorCodes(String userId) {
+        LOGGER.info("In getByUserEducatorCodes. userId = {}", userId);
+        List<ExamDto> examDtos = null;
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    LOGGER.error("Error. No user found {}", userId);
+                    throw new NotFoundException("User not found.");
+                });
+        Set<EducatorCode> educatorCodes = user.getEducatorCodes().stream()
+                .map(educatorCode -> mapper.convertValue(educatorCode, EducatorCode.class))
+                .collect(Collectors.toSet());
+        List<Exam> exams = examRepository.findAllByEducatorCodeIn(educatorCodes);
+        examDtos = exams.stream().map(exam -> mapper.convertValue(exam, ExamDto.class)).collect(Collectors.toList());
+        LOGGER.info("return exams {}", examDtos.size());
+        return examDtos;
     }
 
     private Set<Tag> getFinalTags(Set<Tag> tagSet, List<String> tagNames) {
