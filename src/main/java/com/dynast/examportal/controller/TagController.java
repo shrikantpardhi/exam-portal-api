@@ -1,6 +1,6 @@
 package com.dynast.examportal.controller;
 
-import com.dynast.examportal.model.Tag;
+import com.dynast.examportal.dto.TagDto;
 import com.dynast.examportal.service.TagService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -30,19 +30,19 @@ public class TagController {
     }
 
     @GetMapping(value = {"all"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    Iterable<Tag> all() {
+    Iterable<TagDto> all() {
         LOGGER.info("inside all");
         return tagService.all();
     }
 
     @GetMapping(value = {"search/{name}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    Set<Tag> search(@ApiParam(name = "name", required = true) @PathVariable String name) {
+    Set<TagDto> search(@ApiParam(name = "name", required = true) @PathVariable String name) {
         LOGGER.info("inside search {}", name);
         return tagService.search(name);
     }
 
     @PostMapping(value = {"create"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    Tag search(@ApiParam(name = "tag", required = true) @RequestBody Tag tag) {
+    TagDto search(@ApiParam(name = "tag", required = true) @RequestBody TagDto tag) {
         LOGGER.info("inside create {}", tag.getName());
         return tagService.create(tag);
     }

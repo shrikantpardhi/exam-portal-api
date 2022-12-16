@@ -58,7 +58,7 @@ public class ExamServiceImpl implements ExamService {
         LOGGER.info("inside create {}", examDto.getExamTitle());
         Set<TagDto> tagDtos = examDto.getTags();
         Set<Tag> tags = tagDtos.stream().map(tagDto -> mapper.convertValue(tagDto, Tag.class)).collect(Collectors.toSet());
-        List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName()).collect(Collectors.toList());
+        List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName().toUpperCase()).collect(Collectors.toList());
         Set<Tag> finalTags = getFinalTags(tags, tagNames);
         User user = mapper.convertValue(examDto.getUser(), User.class);
         EducatorCode educatorCode = educatorRepository.findByCode(examDto.getEducatorCode().getCode())
@@ -80,7 +80,7 @@ public class ExamServiceImpl implements ExamService {
         LOGGER.info("inside update {}", examDto.getExamId());
         Set<TagDto> tagDtos = examDto.getTags();
         Set<Tag> tags = tagDtos.stream().map(tagDto -> mapper.convertValue(tagDto, Tag.class)).collect(Collectors.toSet());
-        List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName()).collect(Collectors.toList());
+        List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName().toUpperCase()).collect(Collectors.toList());
         Set<Tag> finalTags = getFinalTags(tags, tagNames);
         Exam exam = examRepository.findById(examDto.getExamId()).map(e -> {
             e = mapper.convertValue(examDto, Exam.class);
@@ -201,6 +201,31 @@ public class ExamServiceImpl implements ExamService {
         List<Exam> exams = examRepository.findAllByEducatorCodeIn(educatorCodes);
         examDtos = exams.stream().map(exam -> mapper.convertValue(exam, ExamDto.class)).collect(Collectors.toList());
         LOGGER.info("return exams {}", examDtos.size());
+        return examDtos;
+    }
+
+    @Override
+    public List<ExamDto> getByTag(String name) {
+        LOGGER.info("Get exams by tag {}", name);
+        Tag tag = tagRepository.findByName(name.toUpperCase()).orElseThrow(() -> new NotFoundException("Tag not found"));
+        List<Exam> exams = examRepository.findAllByTags(tag);
+        List<ExamDto> examDtos = exams.stream()
+                .map(exam -> mapper.convertValue(exam, ExamDto.class))
+                .collect(Collectors.toList());
+        LOGGER.info("tag {}, exams {}", name, examDtos.size());
+        return examDtos;
+    }
+
+    @Override
+    public List<ExamDto> getByTags(List<String> names) {
+        LOGGER.info("Get exams by tag {}", names);
+        names = names.stream().map(String::toUpperCase).collect(Collectors.toList());
+        Set<Tag> tags = tagRepository.findByNameIn(names);
+        List<Exam> exams = examRepository.findAllByTagsIn(tags);
+        List<ExamDto> examDtos = exams.stream()
+                .map(exam -> mapper.convertValue(exam, ExamDto.class))
+                .collect(Collectors.toList());
+        LOGGER.info("exams {}", examDtos.size());
         return examDtos;
     }
 

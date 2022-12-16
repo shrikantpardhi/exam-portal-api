@@ -2,6 +2,7 @@ package com.dynast.examportal.repository;
 
 import com.dynast.examportal.model.EducatorCode;
 import com.dynast.examportal.model.Exam;
+import com.dynast.examportal.model.Tag;
 import com.dynast.examportal.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,8 @@ public interface ExamRepository extends CrudRepository<Exam, String> {
     List<Exam> findByUser(User user);
 
     List<Exam> findAllByEducatorCodeIn(Set<EducatorCode> educatorCodes);
+
+    List<Exam> findAllByTags(Tag tag);
+
+    List<Exam> findAllByTagsIn(Set<Tag> tags);
 }

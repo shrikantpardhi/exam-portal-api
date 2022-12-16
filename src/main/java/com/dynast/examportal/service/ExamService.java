@@ -26,4 +26,8 @@ public interface ExamService {
 
     List<ExamDto> getByUserEducatorCodes(String userId);
 
+    List<ExamDto> getByTag(String name);
+
+    List<ExamDto> getByTags(List<String> names);
+
 }

@@ -2,8 +2,9 @@ package com.dynast.examportal.util;
 
 public enum QuestionType {
 
-    SINGLE_ANSWER("S", "Single"),
-    MULTIPLE("M", "Multiple");
+    SINGLE("S", "Single"),
+    MULTIPLE("M", "Multiple"),
+    INPUT("I","Input");
 
     private final String label;
     private final String description;

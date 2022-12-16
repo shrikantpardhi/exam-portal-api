@@ -11,13 +11,9 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -34,10 +30,6 @@ public class Answer  implements Serializable {
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String answerId;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "questionId", referencedColumnName = "questionId", foreignKey = @ForeignKey(name="FK_ANSWER_QUESTION"))
-    private Question question;
 
     @Type(type = "text")
     @NotNull(message = "Answer is Mandatory")

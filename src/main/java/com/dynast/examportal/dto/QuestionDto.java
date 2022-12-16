@@ -19,9 +19,8 @@ public class QuestionDto implements Serializable {
     private String questionId;
     @JsonProperty("exam")
     private ExamDto exam;
-    @JsonProperty("tags")
-    private List<TagDto> tags;
-    @JsonProperty("questionType")
+    @JsonProperty("tag")
+    private TagDto tag;
     private String questionType;
     private String questionTitle;
     private String questionDescription;

@@ -98,4 +98,12 @@ public class ExamController extends ApplicationController {
         LOGGER.info("in get exam by getByUserEducatorCodes {}", userId);
         return examService.getByUserEducatorCodes(userId);
     }
+
+    @ApiOperation(value = "Get exams by tag.")
+    @GetMapping(value = {"tag/{name}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ExamDto> getByTag(@ApiParam(name = "name", required = true) @PathVariable String name) {
+        LOGGER.info("in get exam by getByTag {}", name);
+        return examService.getByTag(name);
+    }
+
 }
