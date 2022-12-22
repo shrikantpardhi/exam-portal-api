@@ -6,19 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EducatorCodeDto implements Serializable {
-    private String codeId;
-    private String code;
-    private String description;
-    private Boolean isProtected;
-    private Date created;
-    private Date updated;
+@AllArgsConstructor
+@NoArgsConstructor
+public class QAResponses {
+    private List<QAResponse> qaResponses;
 }

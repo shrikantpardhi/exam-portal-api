@@ -66,8 +66,7 @@ public class User extends AbstractTimestampEntity implements Serializable {
     )
     private Set<Role> roles;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-//    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "USER_EDUCATOR_CODE",
             joinColumns = {
                     @JoinColumn(name = "USER_ID")

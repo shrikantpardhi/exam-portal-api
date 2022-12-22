@@ -1,0 +1,20 @@
+[
+  {
+    "question": {
+      "id": "id",
+      "title": "title",
+      "description": "questionDescription",
+      "answerDescription": "answer description",
+      "isNegativeAllowed": "true"
+    },
+    "answer": {
+      "id": "id",
+      "answer": "answer text",
+      "isCorrect": "true"
+    },
+    "selectedAnswer": {
+      "id": "id",
+      "answer": "answer text"
+    }
+  }
+]

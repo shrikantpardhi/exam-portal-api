@@ -9,14 +9,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import java.io.Serializable;
 
 @Getter
@@ -26,22 +24,29 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Result extends AbstractTimestampEntity  implements Serializable {
+public class Quiz extends AbstractTimestampEntity implements Serializable {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    private String resultId;
+    private String quizId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "quizId", referencedColumnName = "quizId")
-    private Quiz quiz;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "examId", referencedColumnName = "examId")
+    private Exam exam;
 
-    /*
-    * 0 < length <=      255  -->  `TINYBLOB`
-    * 255 < length <=    65535  -->  `BLOB`
-    * 65535 < length <= 16777215  -->  `MEDIUMBLOB`
-    * 16777215 < length <=    2³¹-1  -->  `LONGBLOB`*/
-    @Lob
-    @Column(columnDefinition = "MEDIUMBLOB")
-    private byte[] response;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", referencedColumnName = "userId")
+    private User user;
+
+    private String duration;
+    private Boolean submitted = false;
+    private int correctCount = 0;
+    private int inCorrectCount = 0;
+
+    private String obtained;
+    private String negativeObtained;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resultId", referencedColumnName = "resultId")
+    private Result result;
 }

@@ -1,14 +1,26 @@
 package com.dynast.examportal.controller;
 
-import com.dynast.examportal.dto.EducatorCodeDto;
 import com.dynast.examportal.dto.ExamDto;
 import com.dynast.examportal.service.ExamService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -75,10 +87,10 @@ public class ExamController extends ApplicationController {
     }
 
     @ApiOperation(value = "Get exams by educator codes.")
-    @GetMapping(value = {"codes"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ExamDto> getByEducatorCodes(@ApiParam(name = "educatorCodes", required = true) @RequestBody List<EducatorCodeDto> educatorCodes) {
-        LOGGER.info("in get exam by lis of educator code {}", educatorCodes.size());
-        return examService.getByEducatorCodes(educatorCodes);
+    @GetMapping(value = {"codes"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ExamDto> getByEducatorCodes(@ApiParam(name = "educatorCodes", required = true) @RequestParam List<String> educatorCodes) {
+        LOGGER.info("in get exam by list of educator code {}", educatorCodes);
+        return examService.getByEducatorCodes(new HashSet<>(educatorCodes));
     }
 
     @ApiOperation(value = "Get exams by user id.")

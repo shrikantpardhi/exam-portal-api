@@ -1,0 +1,9 @@
+{
+  "startAt": "start time",
+  "endAt": "end time",
+  "duration": "exam Duration",
+  "correctCount": "correct count",
+  "inCorrectCount": "incorrect count",
+  "obtained": "Obtained mark",
+  "negativeObtained": "negativeObtained"
+}

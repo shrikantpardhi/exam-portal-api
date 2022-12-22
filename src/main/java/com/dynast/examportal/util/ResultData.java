@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
-public class ResultJsonData {
+public class ResultData {
     private String seqId;
     private String questionId;
     private String submittedAnswerId;

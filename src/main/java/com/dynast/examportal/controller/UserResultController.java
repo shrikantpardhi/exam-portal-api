@@ -1,7 +1,5 @@
 package com.dynast.examportal.controller;
 
-import com.dynast.examportal.dto.ResultPageDto;
-import com.dynast.examportal.dto.UserResultDto;
 import com.dynast.examportal.exception.DataBaseException;
 import com.dynast.examportal.service.ResultService;
 import io.swagger.annotations.*;

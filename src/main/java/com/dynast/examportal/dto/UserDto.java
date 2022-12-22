@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -33,4 +34,6 @@ public class UserDto implements Serializable {
     private Set<Role> roles;
     @JsonProperty("educatorCodes")
     private Set<EducatorCodeDto> educatorCodes;
+    private Date created;
+    private Date updated;
 }

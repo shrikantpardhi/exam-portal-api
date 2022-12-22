@@ -41,7 +41,7 @@ public class Question extends AbstractTimestampEntity implements Serializable {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String questionId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "examId", referencedColumnName = "examId", foreignKey = @ForeignKey(name="FK_QUESTION_EXAM"))
     private Exam exam;
 

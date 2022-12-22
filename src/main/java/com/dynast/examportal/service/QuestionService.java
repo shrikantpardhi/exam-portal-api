@@ -1,8 +1,9 @@
 package com.dynast.examportal.service;
 
 import com.dynast.examportal.dto.QuestionDto;
+import com.dynast.examportal.util.QuestionType;
 
-import java.util.List;
+import java.util.EnumSet;
 
 public interface QuestionService {
     QuestionDto create(QuestionDto question);
@@ -19,5 +20,5 @@ public interface QuestionService {
 
     Iterable<QuestionDto> getAllQuestion();
 
-    List<String> getQuestionTypes();
+    EnumSet<QuestionType> getQuestionTypes();
 }

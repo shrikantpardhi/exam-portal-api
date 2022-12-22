@@ -56,6 +56,7 @@ public class EducatorCodeController extends ApplicationController {
         return educatorService.update(educatorCode, getUser());
     }
 
+//    not working because of foreign key
     @DeleteMapping(value = {"delete"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteEducatorCode(@ApiParam(name = "educatorCode", required = true) @RequestBody EducatorCodeDto educatorCode) {
         LOGGER.info("inside deleteEducatorCode :{} ", educatorCode.getCode());

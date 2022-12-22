@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -17,7 +18,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class QuestionDto implements Serializable {
     private String questionId;
-    @JsonProperty("exam")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ExamDto exam;
     @JsonProperty("tag")
     private TagDto tag;
@@ -31,4 +32,6 @@ public class QuestionDto implements Serializable {
     private int questionMark;
     @JsonProperty("answers")
     private List<AnswerDto> answers;
+    private Date created;
+    private Date updated;
 }

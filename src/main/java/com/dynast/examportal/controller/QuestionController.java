@@ -3,6 +3,7 @@ package com.dynast.examportal.controller;
 import com.dynast.examportal.dto.QuestionDto;
 import com.dynast.examportal.exception.DataBaseException;
 import com.dynast.examportal.service.QuestionService;
+import com.dynast.examportal.util.QuestionType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.EnumSet;
 
 @RestController
 @Api(value = "Question APIs", tags = {"Question Controller"})
@@ -32,7 +33,7 @@ public class QuestionController extends ApplicationController {
         this.questionService = questionService;
     }
 
-    @ApiOperation(value = "This is used to create a Question")
+    @ApiOperation(value = "Create a Question")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created"),
             @ApiResponse(code = 422, message = "Failed: Unable to create")
@@ -104,7 +105,7 @@ public class QuestionController extends ApplicationController {
             @ApiResponse(code = 404, message = "No data found")
     })
     @GetMapping("get/types")
-    public List<String> getQuestionTypes() {
+    public EnumSet<QuestionType> getQuestionTypes() {
         LOGGER.info("Get all Question Types");
         return questionService.getQuestionTypes();
     }

@@ -1,12 +1,9 @@
 package com.dynast.examportal.service.impl;
 
-import com.dynast.examportal.dto.ResultPageDto;
-import com.dynast.examportal.dto.UserResultDto;
 import com.dynast.examportal.repository.AnswerRepository;
 import com.dynast.examportal.repository.ExamRepository;
 import com.dynast.examportal.repository.QuestionRepository;
 import com.dynast.examportal.repository.UserRepository;
-import com.dynast.examportal.repository.UserResultRepository;
 import com.dynast.examportal.service.ResultService;
 import com.dynast.examportal.util.ObjectMapperSingleton;
 import com.fasterxml.jackson.databind.ObjectMapper;

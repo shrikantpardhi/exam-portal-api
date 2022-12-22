@@ -1,6 +1,5 @@
 package com.dynast.examportal.service.impl;
 
-import com.dynast.examportal.dto.EducatorCodeDto;
 import com.dynast.examportal.dto.ExamDto;
 import com.dynast.examportal.dto.TagDto;
 import com.dynast.examportal.exception.EducatorCodeNotFoundException;
@@ -151,7 +150,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public ExamDto getByExamId(String examId) {
         LOGGER.info("inside findByExamId {}", examId);
-        Exam exam = examRepository.findByExamId(examId)
+        Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> {
                     LOGGER.info("no Exam found. {}", examId);
                     throw new ExamNotFoundException("Exam not found.");
@@ -173,13 +172,11 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public List<ExamDto> getByEducatorCodes(List<EducatorCodeDto> educatorCodeDtos) {
-        LOGGER.info("In getByEducatorCodes. {}", educatorCodeDtos.size());
+    public List<ExamDto> getByEducatorCodes(Set<String> educatorCodes) {
+        LOGGER.info("In getByEducatorCodes. {}", educatorCodes);
         List<ExamDto> examDtos = null;
-        Set<EducatorCode> educatorCodes = educatorCodeDtos.stream()
-                .map(educatorCodeDto -> mapper.convertValue(educatorCodeDto, EducatorCode.class))
-                .collect(Collectors.toSet());
-        List<Exam> exams = examRepository.findAllByEducatorCodeIn(educatorCodes);
+        Set<EducatorCode> educatorCodeSet = educatorRepository.findAllByCodeIn(educatorCodes);
+        List<Exam> exams = examRepository.findAllByEducatorCodeIn(educatorCodeSet);
         examDtos = exams.stream()
                 .map(exam -> mapper.convertValue(exam, ExamDto.class))
                 .collect(Collectors.toList());

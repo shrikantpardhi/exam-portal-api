@@ -1,9 +1,9 @@
 package com.dynast.examportal.service;
 
-import com.dynast.examportal.dto.EducatorCodeDto;
 import com.dynast.examportal.dto.ExamDto;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ExamService {
     ExamDto create(ExamDto examDto);
@@ -22,7 +22,7 @@ public interface ExamService {
 
     ExamDto changeStatus(String examId);
 
-    List<ExamDto> getByEducatorCodes(List<EducatorCodeDto> educatorCodeDtos);
+    List<ExamDto> getByEducatorCodes(Set<String> educatorCodes);
 
     List<ExamDto> getByUserEducatorCodes(String userId);
 

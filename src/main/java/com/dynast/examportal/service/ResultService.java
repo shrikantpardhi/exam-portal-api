@@ -1,8 +1,5 @@
 package com.dynast.examportal.service;
 
-import com.dynast.examportal.dto.ResultPageDto;
-import com.dynast.examportal.dto.UserResultDto;
-
 public interface ResultService {
     Iterable<UserResultDto> getAll();
 

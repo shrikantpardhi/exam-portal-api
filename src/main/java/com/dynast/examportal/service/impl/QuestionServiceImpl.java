@@ -12,7 +12,6 @@ import com.dynast.examportal.model.Tag;
 import com.dynast.examportal.repository.AnswerRepository;
 import com.dynast.examportal.repository.ExamRepository;
 import com.dynast.examportal.repository.QuestionRepository;
-import com.dynast.examportal.repository.QuestionTypeRepository;
 import com.dynast.examportal.repository.TagRepository;
 import com.dynast.examportal.service.QuestionService;
 import com.dynast.examportal.util.ObjectMapperSingleton;
@@ -22,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,18 +35,15 @@ public class QuestionServiceImpl implements QuestionService {
 
     private final ExamRepository examRepository;
 
-    private final QuestionTypeRepository questionTypeRepository;
-
     private final AnswerRepository answerRepository;
 
     private final TagRepository tagRepository;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, ExamRepository examRepository, QuestionTypeRepository questionTypeRepository, AnswerRepository answerRepository, TagRepository tagRepository) {
+    public QuestionServiceImpl(QuestionRepository questionRepository, ExamRepository examRepository, AnswerRepository answerRepository, TagRepository tagRepository) {
         this.questionRepository = questionRepository;
         this.examRepository = examRepository;
-        this.questionTypeRepository = questionTypeRepository;
         this.answerRepository = answerRepository;
         this.tagRepository = tagRepository;
     }
@@ -183,22 +179,19 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<String> getQuestionTypes() {
+    public EnumSet<QuestionType> getQuestionTypes() {
         LOGGER.info("in getQuestionTypes");
-        List<String> questionTypes = new ArrayList<>();
-        questionTypes.add(QuestionType.SINGLE.getDescription());
-        questionTypes.add(QuestionType.MULTIPLE.getDescription());
-        questionTypes.add(QuestionType.INPUT.getDescription());
+        EnumSet<QuestionType> questionTypes = EnumSet.allOf(QuestionType.class);
         return questionTypes;
     }
 
     private String getQuestionType(QuestionDto question) {
         String questionType = null;
-        if (QuestionType.SINGLE.getDescription().equals(question.getQuestionType())) {
+        if (QuestionType.SINGLE.getDescription().equalsIgnoreCase(question.getQuestionType())) {
             questionType = QuestionType.SINGLE.getLabel();
-        } else if (QuestionType.SINGLE.getDescription().equals(question.getQuestionType())) {
+        } else if (QuestionType.SINGLE.getDescription().equalsIgnoreCase(question.getQuestionType())) {
             questionType = QuestionType.SINGLE.getLabel();
-        } else if (QuestionType.SINGLE.getDescription().equals(question.getQuestionType())) {
+        } else if (QuestionType.SINGLE.getDescription().equalsIgnoreCase(question.getQuestionType())) {
             questionType = QuestionType.SINGLE.getLabel();
         }
         return questionType;

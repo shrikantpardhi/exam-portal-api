@@ -49,12 +49,12 @@ public class Exam extends AbstractTimestampEntity implements Serializable {
     private Date examEndDate;
     private Boolean isPaid;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade= {CascadeType.REMOVE, CascadeType.PERSIST})
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codeId", referencedColumnName = "codeId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private EducatorCode educatorCode;
 
 //    allow educator or admin to create exam
-    @OneToOne(fetch = FetchType.EAGER, cascade= {CascadeType.REMOVE, CascadeType.PERSIST})
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="userId", referencedColumnName = "userId", foreignKey = @ForeignKey(name="FK_EXAM_USER"))
     private User user;
     private Boolean status = true;
