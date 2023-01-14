@@ -4,13 +4,12 @@ import com.dynast.examportal.dto.QAResponse;
 import com.dynast.examportal.dto.QAResponses;
 import com.dynast.examportal.dto.QuizDto;
 import com.dynast.examportal.exception.NotFoundException;
+import com.dynast.examportal.model.EducatorCode;
 import com.dynast.examportal.model.Exam;
 import com.dynast.examportal.model.Quiz;
-import com.dynast.examportal.model.Result;
 import com.dynast.examportal.model.User;
 import com.dynast.examportal.repository.ExamRepository;
 import com.dynast.examportal.repository.QuizRepository;
-import com.dynast.examportal.repository.ResultRepository;
 import com.dynast.examportal.repository.UserRepository;
 import com.dynast.examportal.service.QuizService;
 import com.dynast.examportal.util.ObjectMapperSingleton;
@@ -21,30 +20,32 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class QuizServiceImpl implements QuizService {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuizServiceImpl.class);
     private final QuizRepository quizRepository;
     private final ExamRepository examRepository;
     private final UserRepository userRepository;
-    private final ResultRepository resultRepository;
 
     ObjectMapper mapper = ObjectMapperSingleton.getInstance();
 
-    public QuizServiceImpl(QuizRepository quizRepository, ExamRepository examRepository, UserRepository userRepository, ResultRepository resultRepository) {
+    public QuizServiceImpl(QuizRepository quizRepository, ExamRepository examRepository, UserRepository userRepository) {
         this.quizRepository = quizRepository;
         this.examRepository = examRepository;
         this.userRepository = userRepository;
-        this.resultRepository = resultRepository;
     }
 
     /*
      * create when user start quiz.
      * on create there is no response. */
     @Override
-    public QuizDto create(@NonNull QuizDto quizDto) throws IOException {
+    public QuizDto create(@NonNull QuizDto quizDto) {
         LOGGER.info("create quiz first time. exam name: {}", quizDto.getExam().getExamTitle());
         Exam exam = examRepository.findById(quizDto.getExam().getExamId()).get();
         User user = userRepository.findById(quizDto.getUser().getUserId()).get();
@@ -59,7 +60,6 @@ public class QuizServiceImpl implements QuizService {
     public QuizDto update(@NonNull QuizDto quizDto) {
         LOGGER.info("inside update quiz id: {}", quizDto.getQuizId());
         Quiz quiz = quizRepository.findById(quizDto.getQuizId()).get();
-        Result result = new Result();
         QAResponses qaResponses = mapper.convertValue(quizDto.getQaResponses(), QAResponses.class);
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
@@ -67,17 +67,13 @@ public class QuizServiceImpl implements QuizService {
         } catch (IOException ex) {
             LOGGER.error("Unable to parse result data. {}", ex.getMessage());
         }
-        // save response in result entity
-        result.setQuiz(quiz);
-        result.setResponse(out.toByteArray());
-        result = resultRepository.save(result);
 
         // calculate mark details
         setMarkDetail(quiz, qaResponses);
 
         quiz.setSubmitted(quizDto.getSubmitted());
         quiz.setDuration(getDuration(quiz));
-        quiz.setResult(result);
+        quiz.setResponse(out.toByteArray());
         quiz = quizRepository.save(quiz);
         return mapper.convertValue(quiz, QuizDto.class);
     }
@@ -114,7 +110,50 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public List<QuizDto> getQuizByUser(@NonNull String userId) {
-        return null;
+        LOGGER.info("getQuizByUser: {}", userId);
+        User user = userRepository.findById(userId).get();
+        List<Quiz> quizList = quizRepository.findAllByUser(user).orElseThrow(() -> {
+            LOGGER.error("No quiz found. {}", userId);
+            throw new NotFoundException("No quiz found");
+        });
+        return quizList.stream().map(quiz -> mapper.convertValue(quiz, QuizDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<QuizDto> fetchAll() {
+        LOGGER.info("inside fetchAll");
+        Iterable<Quiz> all = quizRepository.findAll();
+        List<QuizDto> quizDtos = StreamSupport.stream(all.spliterator(), false)
+                .map(quiz -> mapper.convertValue(quiz, QuizDto.class))
+                .collect(Collectors.toList());
+        return quizDtos;
+    }
+
+    @Override
+    public List<QuizDto> fetchAllByEducator(@NonNull String userId) {
+        LOGGER.info("inside fetchAllByEducator: {}", userId);
+        User user = userRepository.findById(userId).get();
+        Set<EducatorCode> codes = user.getEducatorCodes();
+        List<Exam> exams = examRepository.findAllByEducatorCodeIn(codes);
+        List<Quiz> quizList = quizRepository.findAllByExamIn(exams);
+        return quizList.stream().map(quiz -> mapper.convertValue(quiz, QuizDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public QuizDto fetchById(@NonNull String quizId) {
+        LOGGER.info("inside fetchById: {}", quizId);
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new NotFoundException("Quiz not found"));
+        return mapper.convertValue(quiz, QuizDto.class);
+    }
+
+    @Override
+    public List<QuizDto> fetchAllByExams(@NonNull String examIds) {
+        LOGGER.info("inside fetchAllByExams: {}", examIds);
+        List<String> ids = Arrays.asList(examIds.split(" , "));
+        Iterable<Exam> exams = examRepository.findAllById(ids);
+        List<Quiz> quizList = quizRepository.findAllByExamIn(StreamSupport.stream(exams.spliterator(), false).collect(Collectors.toList()));
+        List<QuizDto> quizDtos = quizList.stream().map(quiz -> mapper.convertValue(quiz, QuizDto.class)).collect(Collectors.toList());
+        return quizDtos;
     }
 
     private String getDuration(Quiz quiz) {
