@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +18,4 @@ public class EducatorCodeDto implements Serializable {
     private String code;
     private String description;
     private Boolean isProtected;
-    private Date created;
-    private Date updated;
 }

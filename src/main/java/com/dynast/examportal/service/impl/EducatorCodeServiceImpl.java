@@ -37,6 +37,7 @@ public class EducatorCodeServiceImpl implements EducatorCodeService {
         LOGGER.info("inside create: " + educatorCodeDto.getCode());
         Set<EducatorCode> educatorCodes = new HashSet<>();
         EducatorCode educatorCode = mapper.convertValue(educatorCodeDto, EducatorCode.class);
+        educatorCode.getCode().toUpperCase();
         educatorCode = educatorRepository.save(educatorCode);
         educatorCodes.add(educatorCode);
         educatorCodes.addAll(user.getEducatorCodes());
@@ -49,7 +50,7 @@ public class EducatorCodeServiceImpl implements EducatorCodeService {
     public EducatorCodeDto update(EducatorCodeDto educatorCodeDto, User userDto) {
         LOGGER.info("inside update: " + educatorCodeDto.getCode());
         educatorRepository.findById(educatorCodeDto.getCodeId()).map(eCode -> {
-            eCode.setCode(educatorCodeDto.getCode());
+            eCode.setCode(educatorCodeDto.getCode().toUpperCase());
             eCode.setDescription(educatorCodeDto.getDescription());
             eCode.setIsProtected(educatorCodeDto.getIsProtected());
             return educatorRepository.save(eCode);
@@ -69,7 +70,7 @@ public class EducatorCodeServiceImpl implements EducatorCodeService {
     @Override
     public List<EducatorCodeDto> fetchAll() {
         LOGGER.info("inside fetchAll.");
-        List<EducatorCodeDto>  educatorCodeDtos = new ArrayList<>();
+        List<EducatorCodeDto> educatorCodeDtos = new ArrayList<>();
         educatorRepository.findAll().forEach(
                 educatorCode -> educatorCodeDtos.add(mapper.convertValue(educatorCode, EducatorCodeDto.class))
         );

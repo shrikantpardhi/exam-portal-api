@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -71,6 +72,7 @@ public class ExamServiceImpl implements ExamService {
         exam.setTags(finalTags);
         exam = examRepository.save(exam);
         ExamDto dto = mapper.convertValue(exam, ExamDto.class);
+        LOGGER.info("exam created {}", dto.getExamTitle());
         return dto;
     }
 
@@ -79,16 +81,26 @@ public class ExamServiceImpl implements ExamService {
         LOGGER.info("inside update {}", examDto.getExamId());
         Set<TagDto> tagDtos = examDto.getTags();
         Set<Tag> tags = tagDtos.stream().map(tagDto -> mapper.convertValue(tagDto, Tag.class)).collect(Collectors.toSet());
-        List<String> tagNames = examDto.getTags().stream().map(tag->tag.getName().toUpperCase()).collect(Collectors.toList());
-        Set<Tag> finalTags = getFinalTags(tags, tagNames);
-        Exam exam = examRepository.findById(examDto.getExamId()).map(e -> {
-            e = mapper.convertValue(examDto, Exam.class);
-            e.setTags(finalTags);
-            return examRepository.save(e);
-        }).orElseThrow(() -> {
-            LOGGER.info("Unable to update an Exam. {}", examDto.getExamId());
-            throw new UnprocessableEntityException("Unable to update an Exam");
-        });
+        Exam exam = examRepository.findById(examDto.getExamId()).get();
+        if (!tags.isEmpty()) {
+            exam.setTags(tags);
+        }
+        if (Objects.nonNull(examDto.getEducatorCode()) && Objects.nonNull(examDto.getEducatorCode().getCodeId())) {
+            EducatorCode code = mapper.convertValue(examDto.getEducatorCode(), EducatorCode.class);
+            exam.setEducatorCode(code);
+        }
+        User user = mapper.convertValue(examDto.getUser(), User.class);
+        exam.setExamTitle(examDto.getExamTitle());
+        exam.setExamDescription(examDto.getExamDescription());
+        exam.setExamDuration(examDto.getExamDuration());
+        exam.setExamStartDate(examDto.getExamStartDate());
+        exam.setExamEndDate(examDto.getExamEndDate());
+        exam.setStatus(examDto.getStatus());
+        exam.setIsNegativeAllowed(examDto.getIsNegativeAllowed());
+        exam.setIsPaid(examDto.getIsPaid());
+        exam.setTotalMark(examDto.getTotalMark());
+        exam.setUser(user);
+        exam = examRepository.save(exam);
         ExamDto dto = mapper.convertValue(exam, ExamDto.class);
         return dto;
     }
